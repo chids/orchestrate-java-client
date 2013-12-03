@@ -51,10 +51,10 @@ dependencies {
     compile(
         [group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion],
         [group: 'org.glassfish.grizzly', name: 'grizzly-http', version: grizzlyVersion],
-        [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.3.0-rc1']
+        [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.3.0']
     )
     testCompile(
-        [group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.2.0-rc-2'],
+        [group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.2.1'],
         [group: 'org.spockframework', name: 'spock-core', version: '0.7-groovy-2.0']
     )
     testRuntime(
