@@ -15,10 +15,9 @@
  */
 package io.orchestrate.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.orchestrate.client.convert.ConversionException;
-import io.orchestrate.client.convert.Converter;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpHeader;
 import org.glassfish.grizzly.http.HttpRequestPacket;
@@ -37,32 +36,32 @@ public final class EventFetchOperation<T> extends AbstractOperation<Events<T>> {
     private final String collection;
     private final String key;
     private final String type;
-    private final Converter<T> converter;
+    private final Class<T> clazz;
     private final Long start;
     private final Long end;
 
     public EventFetchOperation(
-            final String collection, final String key, final String type, final Converter<T> converter) {
-        this(collection, key, type, converter, null, null);
+            final String collection, final String key, final String type, final Class<T> clazz) {
+        this(collection, key, type, clazz, null, null);
     }
 
     public EventFetchOperation(
-            final String collection, final String key, final String type, final Converter<T> converter, final long start) {
-        this(collection, key, type, converter, start, null);
+            final String collection, final String key, final String type, final Class<T> clazz, final long start) {
+        this(collection, key, type, clazz, start, null);
     }
 
     public EventFetchOperation(
             final String collection,
             final String key,
             final String type,
-            final Converter<T> converter,
+            final Class<T> clazz,
             @Nullable final Long start,
             @Nullable final Long end) {
         // TODO add input validation
         this.collection = collection;
         this.key = key;
         this.type = type;
-        this.converter = converter;
+        this.clazz = clazz;
         this.start = start;
         this.end = end;
     }
@@ -98,11 +97,9 @@ public final class EventFetchOperation<T> extends AbstractOperation<Events<T>> {
             final HttpContent content, final HttpHeader header, final HttpStatus status) {
         switch (status.getStatusCode()) {
             case 200:
-                // TODO allow this deserialization to *not* depend on Jackson
-                ObjectMapper mapper = new ObjectMapper();
                 final JsonNode jsonNode;
                 try {
-                    jsonNode = mapper.readTree(content.getContent().toStringContent());
+                    jsonNode = Client.MAPPER.readTree(content.getContent().toStringContent());
                 } catch (final IOException e) {
                     throw new ConversionException(e);
                 }
@@ -114,8 +111,16 @@ public final class EventFetchOperation<T> extends AbstractOperation<Events<T>> {
                     final JsonNode result = iter.next();
 
                     final long timestamp = result.get("timestamp").asLong();
-                    final String rawValue = result.get("value").toString();
-                    final T value = converter.toDomain(rawValue);
+
+                    final JsonNode valueNode = result.get("value");
+                    final String rawValue = valueNode.toString();
+
+                    final T value;
+                    try {
+                        value = Client.MAPPER.treeToValue(valueNode, clazz);
+                    } catch (final JsonProcessingException e) {
+                        throw new ConversionException(e);
+                    }
 
                     events.add(new Event<T>(value, rawValue, timestamp));
                 }

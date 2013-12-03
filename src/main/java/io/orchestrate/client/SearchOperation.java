@@ -15,11 +15,9 @@
  */
 package io.orchestrate.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.orchestrate.client.convert.ConversionException;
-import io.orchestrate.client.convert.Converter;
-import io.orchestrate.client.convert.NoOpConverter;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.glassfish.grizzly.http.*;
@@ -51,7 +49,7 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
     /** The builder for this search operation. */
     private final Builder builder;
     /** The converter to deserialize the JSON results with. */
-    private final Converter<T> converter;
+    private final Class<T> clazz;
 
     /**
      * Create a search operation on the specified {@code collection}.
@@ -67,8 +65,8 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
      * @param
      * @see Builder#LUCENE_STAR_QUERY
      */
-    public SearchOperation(final String collection, final Converter<T> converter) {
-        this(builder(collection), converter);
+    public SearchOperation(final String collection, final Class<T> clazz) {
+        this(builder(collection), clazz);
     }
 
     /**
@@ -76,11 +74,11 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
      *
      * @param builder The builder used to configure this search operation.
      */
-    private SearchOperation(final Builder builder, final Converter<T> converter) {
+    private SearchOperation(final Builder builder, final Class<T> clazz) {
         assert (builder != null);
 
         this.builder = builder;
-        this.converter = converter;
+        this.clazz = clazz;
     }
 
     /** {@inheritDoc} */
@@ -105,11 +103,9 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
     SearchResults<T> decode(final HttpContent content, final HttpHeader header, final HttpStatus status) {
         switch (status.getStatusCode()) {
             case 200:
-                // TODO allow this deserialization to *not* depend on Jackson
-                ObjectMapper mapper = new ObjectMapper();
                 final JsonNode jsonNode;
                 try {
-                    jsonNode = mapper.readTree(content.getContent().toStringContent());
+                    jsonNode = Client.MAPPER.readTree(content.getContent().toStringContent());
                 } catch (final IOException e) {
                     throw new ConversionException(e);
                 }
@@ -133,8 +129,16 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
                     // parse result structure (e.g.):
                     // {"path":{...},"value":{},"score":1.0}
                     final double score = result.get("score").asDouble();
-                    final String rawValue = result.get("value").toString();
-                    final T value = converter.toDomain(rawValue);
+                    final JsonNode valueNode = result.get("value");
+                    final String rawValue = valueNode.toString();
+
+                    final T value;
+                    try {
+                        value = Client.MAPPER.treeToValue(valueNode, clazz);
+                    } catch (final JsonProcessingException e) {
+                        throw new ConversionException(e);
+                    }
+
                     final KvObject<T> kvObject = new KvObject<T>(metadata, value, rawValue);
 
                     results.add(new Result<T>(kvObject, score));
@@ -257,17 +261,17 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
          * @return A new {@link SearchOperation}.
          */
         public SearchOperation<String> build() {
-            return new SearchOperation<String>(this, NoOpConverter.INSTANCE);
+            return new SearchOperation<String>(this, String.class);
         }
 
         /**
          * Creates a new {@code SearchOperation}.
          *
-         * @param converter The converter to deserialize search results with.
+         * @param clazz The converter to deserialize search results with.
          * @return A new {@link SearchOperation}.
          */
-        public <T> SearchOperation<T> build(final Converter<T> converter) {
-            return new SearchOperation<T>(this, converter);
+        public <T> SearchOperation<T> build(final Class<T> clazz) {
+            return new SearchOperation<T>(this, clazz);
         }
 
     }

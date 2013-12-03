@@ -15,8 +15,7 @@
  */
 package io.orchestrate.client;
 
-import io.orchestrate.client.convert.Converter;
-import io.orchestrate.client.convert.NoOpConverter;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.glassfish.grizzly.http.*;
 import org.glassfish.grizzly.http.util.Header;
 import org.glassfish.grizzly.http.util.HttpStatus;
@@ -33,8 +32,6 @@ public final class KvStoreOperation<T> extends AbstractOperation<KvMetadata> {
     /**  */
     private final String key;
     /**  */
-    private final Converter<T> converter;
-    /**  */
     private final T value;
     /**  */
     private final String currentRef;
@@ -42,26 +39,24 @@ public final class KvStoreOperation<T> extends AbstractOperation<KvMetadata> {
     private final boolean ifAbsent;
 
     public KvStoreOperation(
-            final String collection, final String key, final Converter<T> converter, final T value) {
-        this(collection, key, converter, value, null, false);
+            final String collection, final String key, final T value) {
+        this(collection, key, value, null, false);
     }
 
     public KvStoreOperation(
-            final String collection, final String key, final Converter<T> converter, final T value, final String currentRef) {
-        this(collection, key, converter, value, currentRef, false);
+            final String collection, final String key, final T value, final String currentRef) {
+        this(collection, key, value, currentRef, false);
     }
 
     private KvStoreOperation(
             final String collection,
             final String key,
-            final Converter<T> converter,
             final T value,
             @Nullable final String currentRef,
             final boolean ifAbsent) {
         // TODO add input checking
         this.collection = collection;
         this.key = key;
-        this.converter = converter;
         this.value = value;
         this.currentRef = currentRef;
         this.ifAbsent = ifAbsent;
@@ -84,7 +79,12 @@ public final class KvStoreOperation<T> extends AbstractOperation<KvMetadata> {
             httpHeaderBuilder.header(Header.IfNoneMatch, "*");
         }
 
-        final String json = converter.fromDomain(value);
+        final String json;
+        try {
+            json = Client.MAPPER.writeValueAsString(value);
+        } catch (final JsonProcessingException e) {
+            throw new ConversionException(e);
+        }
 
         final ByteBuffer contentBuffer = ByteBuffer.wrap(json.getBytes());
         final HttpRequestPacket httpHeader = httpHeaderBuilder
@@ -110,11 +110,6 @@ public final class KvStoreOperation<T> extends AbstractOperation<KvMetadata> {
                 // FIXME do better with this error handling
                 throw new RuntimeException();
         }
-    }
-
-    public static KvStoreOperation<String> raw(
-            final String collection, final String key, final String value) {
-        return new KvStoreOperation<String>(collection, key, NoOpConverter.INSTANCE, value);
     }
 
 }

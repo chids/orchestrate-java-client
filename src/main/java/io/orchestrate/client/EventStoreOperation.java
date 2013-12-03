@@ -15,8 +15,7 @@
  */
 package io.orchestrate.client;
 
-import io.orchestrate.client.convert.Converter;
-import io.orchestrate.client.convert.NoOpConverter;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpHeader;
 import org.glassfish.grizzly.http.HttpRequestPacket;
@@ -33,39 +32,36 @@ public final class EventStoreOperation<T> extends AbstractOperation<Boolean> {
     private final String collection;
     private final String key;
     private final String type;
-    private final Converter<T> converter;
     private final T value;
     private final Long timestamp;
 
     public EventStoreOperation(
-            final String collection, final String key, final String type, final Converter<T> converter, final T value) {
-        this(collection, key, type, converter, value, null);
+            final String collection, final String key, final String type, final T value) {
+        this(collection, key, type, value, null);
     }
 
     public EventStoreOperation(
             final String collection,
             final String key,
             final String type,
-            final Converter<T> converter,
             final T value,
             @Nullable final Long timestamp) {
         // TODO add input validation
         this.collection = collection;
         this.key = key;
         this.type = type;
-        this.converter = converter;
         this.value = value;
         this.timestamp = timestamp;
     }
 
     public EventStoreOperation(
-            final KvObject<?> kvObject, final String type, final Converter<T> converter, final T value) {
-        this(kvObject.getCollection(), kvObject.getKey(), type, converter, value);
+            final KvObject<?> kvObject, final String type, final T value) {
+        this(kvObject.getCollection(), kvObject.getKey(), type, value);
     }
 
     public EventStoreOperation(
-            final KvObject<?> kvObject, final String type, final Converter<T> converter, final T value, final long timestamp) {
-        this(kvObject.getCollection(), kvObject.getKey(), type, converter, value, timestamp);
+            final KvObject<?> kvObject, final String type, final T value, final long timestamp) {
+        this(kvObject.getCollection(), kvObject.getKey(), type, value, timestamp);
     }
 
     /** {@inheritDoc} */
@@ -82,7 +78,12 @@ public final class EventStoreOperation<T> extends AbstractOperation<Boolean> {
             httpHeaderBuilder.query("timestamp=".concat(timestamp.toString()));
         }
 
-        final String json = converter.fromDomain(value);
+        final String json;
+        try {
+            json = Client.MAPPER.writeValueAsString(value);
+        } catch (final JsonProcessingException e) {
+            throw new ConversionException(e);
+        }
 
         final ByteBuffer contentBuffer = ByteBuffer.wrap(json.getBytes());
         final HttpRequestPacket httpHeader = httpHeaderBuilder
@@ -105,26 +106,6 @@ public final class EventStoreOperation<T> extends AbstractOperation<Boolean> {
                 // FIXME do better with this error handling
                 throw new RuntimeException();
         }
-    }
-
-    public static EventStoreOperation<String> raw(
-            final String collection, final String key, final String type, final String value) {
-        return new EventStoreOperation<String>(collection, key, type, NoOpConverter.INSTANCE, value);
-    }
-
-    public static EventStoreOperation<String> raw(
-            final String collection, final String key, final String type, final String value, final long timestamp) {
-        return new EventStoreOperation<String>(collection, key, type, NoOpConverter.INSTANCE, value, timestamp);
-    }
-
-    public static EventStoreOperation<String> raw(
-            final KvObject<?> kvObject, final String type, final String value) {
-        return new EventStoreOperation<String>(kvObject.getCollection(), kvObject.getKey(), type, NoOpConverter.INSTANCE, value);
-    }
-
-    public static EventStoreOperation<String> raw(
-            final KvObject<?> kvObject, final String type, final String value, final long timestamp) {
-        return new EventStoreOperation<String>(kvObject.getCollection(), kvObject.getKey(), type, NoOpConverter.INSTANCE, value, timestamp);
     }
 
 }

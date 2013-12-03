@@ -15,13 +15,12 @@
  */
 package io.orchestrate.client;
 
-import io.orchestrate.client.convert.Converter;
-import io.orchestrate.client.convert.NoOpConverter;
 import org.glassfish.grizzly.http.*;
 import org.glassfish.grizzly.http.util.Header;
 import org.glassfish.grizzly.http.util.HttpStatus;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 
 // TODO document this
 public final class KvFetchOperation<T> extends AbstractOperation<KvObject<T>> {
@@ -33,13 +32,13 @@ public final class KvFetchOperation<T> extends AbstractOperation<KvObject<T>> {
     /**  */
     private final String ref;
     /**  */
-    private final Converter<T> converter;
+    private final Class<T> clazz;
 
-    public KvFetchOperation(final String collection, final String key, final Converter<T> converter) {
-        this(collection, key, converter, null);
+    public KvFetchOperation(final String collection, final String key, final Class<T> clazz) {
+        this(collection, key, clazz, null);
     }
 
-    public KvFetchOperation(final String collection, final String key, final Converter<T> converter, @Nullable final String ref) {
+    public KvFetchOperation(final String collection, final String key, final Class<T> clazz, @Nullable final String ref) {
         if (collection == null) {
             throw new IllegalArgumentException("'collection' cannot be null.");
         }
@@ -52,12 +51,12 @@ public final class KvFetchOperation<T> extends AbstractOperation<KvObject<T>> {
         if (key.length() < 1) {
             throw new IllegalArgumentException("'key' cannot be empty.");
         }
-        if (converter == null) {
+        if (clazz == null) {
             throw new IllegalArgumentException("'converter' cannot be null.");
         }
         this.collection = collection;
         this.key = key;
-        this.converter = converter;
+        this.clazz = clazz;
         this.ref = ref;
     }
 
@@ -85,7 +84,12 @@ public final class KvFetchOperation<T> extends AbstractOperation<KvObject<T>> {
         switch (status.getStatusCode()) {
             case 200:
                 final String json = content.getContent().toStringContent();
-                final T value = converter.toDomain(json);
+                final T value;
+                try {
+                    value = Client.MAPPER.readValue(json, clazz);
+                } catch (final IOException e) {
+                    throw new ConversionException(e);
+                }
 
                 final String ref = header.getHeader(Header.ETag)
                         .replace("\"", "")
@@ -97,16 +101,6 @@ public final class KvFetchOperation<T> extends AbstractOperation<KvObject<T>> {
                 // FIXME do better with this error handling
                 throw new RuntimeException();
         }
-    }
-
-    // TODO document this
-    public static KvFetchOperation<String> raw(final String collection, final String key) {
-        return new KvFetchOperation<String>(collection, key, NoOpConverter.INSTANCE);
-    }
-
-    // TODO document this
-    public static KvFetchOperation<String> raw(final String collection, final String key, final String ref) {
-        return new KvFetchOperation<String>(collection, key, NoOpConverter.INSTANCE, ref);
     }
 
 }

@@ -15,6 +15,7 @@
  */
 package io.orchestrate.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.filterchain.FilterChain;
@@ -49,6 +50,8 @@ public final class Client {
 
     /** Initial API; has KV, Events, Search, and early Graph support. */
     public static final API V0 = API.v0;
+    /** The shared JSON mapping handler. */
+    static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
      * The different versions of the Orchestrate.io service.

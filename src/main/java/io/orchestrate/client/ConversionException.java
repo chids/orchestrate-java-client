@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.orchestrate.client.convert;
+package io.orchestrate.client;
 
 // TODO document this
-public final class NoOpConverter implements Converter<String> {
+@SuppressWarnings("serial")
+public final class ConversionException extends RuntimeException {
 
-    /** The default instance of the converter. */
-    public static final NoOpConverter INSTANCE = new NoOpConverter();
-
-    /** {@inheritDoc} */
-    @Override
-    public String toDomain(final String json) {
-        return json;
+    // TODO document this
+    public ConversionException(final String message) {
+        super(message);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String fromDomain(final String domainObject) {
-        return domainObject;
+    // TODO document this
+    public ConversionException(final Throwable cause) {
+        super(cause);
+    }
+
+    // TODO document this
+    public ConversionException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 
 }

@@ -17,7 +17,6 @@ package io.orchestrate.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.orchestrate.client.convert.ConversionException;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpHeader;
 import org.glassfish.grizzly.http.HttpRequestPacket;
@@ -67,11 +66,9 @@ public final class GraphFetchOperation extends AbstractOperation<Iterable<KvObje
             final HttpContent content, final HttpHeader header, final HttpStatus status) {
         switch (status.getStatusCode()) {
             case 200:
-                // TODO allow this deserialization to *not* depend on Jackson
-                ObjectMapper mapper = new ObjectMapper();
                 final JsonNode jsonNode;
                 try {
-                    jsonNode = mapper.readTree(content.getContent().toStringContent());
+                    jsonNode = Client.MAPPER.readTree(content.getContent().toStringContent());
                 } catch (final IOException e) {
                     throw new ConversionException(e);
                 }
