@@ -6,16 +6,6 @@ apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 
-// FIXME temporary
-    apply plugin: 'application'
-    mainClassName = 'io.orchestrate.client.Main'
-    dependencies.runtime group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.5'
-    run {
-        systemProperties [
-            System.getProperty('org.slf4j.simpleLogger.defaultLogLevel', 'trace')
-        ]
-    }
-
 def groovyVersion = 'groovy-2.1.8'
 
 group   = 'io.orchestrate'
@@ -28,9 +18,9 @@ plugins.withType(JavaPlugin) {
     tasks.withType(Compile).all {
         // enable all warnings as errors
         options.compilerArgs = [
-                '-Xlint:cast,deprecation,divzero,empty,unchecked,fallthrough,path,serial,finally,overrides,-options',
-                '-Werror',
-                '-XprintProcessorInfo'
+            '-Xlint:cast,deprecation,divzero,empty,unchecked,fallthrough,path,serial,finally,overrides,-options',
+            '-Werror',
+            '-XprintProcessorInfo'
         ]
         options.encoding = "UTF-8"
     }
@@ -61,7 +51,7 @@ dependencies {
     compile(
         [group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion],
         [group: 'org.glassfish.grizzly', name: 'grizzly-http', version: grizzlyVersion],
-        [group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.3.0-rc1']
+        [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.3.0-rc1']
     )
     testCompile(
         [group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.2.0-rc-2'],
