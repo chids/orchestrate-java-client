@@ -17,7 +17,6 @@ package io.orchestrate.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpHeader;
 import org.glassfish.grizzly.http.HttpRequestPacket;
@@ -31,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 // TODO document this
-public final class EventFetchOperation<T> extends AbstractOperation<Events<T>> {
+public final class EventFetchOperation<T> extends AbstractOperation<Iterable<Event<T>>> {
 
     private final String collection;
     private final String key;
@@ -93,7 +92,7 @@ public final class EventFetchOperation<T> extends AbstractOperation<Events<T>> {
 
     /** {@inheritDoc} */
     @Override
-    Events<T> decode(
+    Iterable<Event<T>> decode(
             final HttpContent content, final HttpHeader header, final HttpStatus status) {
         switch (status.getStatusCode()) {
             case 200:
@@ -125,8 +124,7 @@ public final class EventFetchOperation<T> extends AbstractOperation<Events<T>> {
                     events.add(new Event<T>(value, rawValue, timestamp));
                 }
 
-                // TODO remove unnecessary "Events" wrapper object
-                return new Events<T>(events);
+                return events;
             default:
                 // FIXME do better with this error handling
                 throw new RuntimeException();
