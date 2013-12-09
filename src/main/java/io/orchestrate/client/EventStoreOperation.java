@@ -27,16 +27,16 @@ import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 
 // TODO document this
-public final class EventStoreOperation<T> extends AbstractOperation<Boolean> {
+public final class EventStoreOperation extends AbstractOperation<Boolean> {
 
     private final String collection;
     private final String key;
     private final String type;
-    private final T value;
+    private final Object value;
     private final Long timestamp;
 
     public EventStoreOperation(
-            final String collection, final String key, final String type, final T value) {
+            final String collection, final String key, final String type, final Object value) {
         this(collection, key, type, value, null);
     }
 
@@ -44,7 +44,7 @@ public final class EventStoreOperation<T> extends AbstractOperation<Boolean> {
             final String collection,
             final String key,
             final String type,
-            final T value,
+            final Object value,
             @Nullable final Long timestamp) {
         // TODO add input validation
         this.collection = collection;
@@ -55,12 +55,12 @@ public final class EventStoreOperation<T> extends AbstractOperation<Boolean> {
     }
 
     public EventStoreOperation(
-            final KvObject<?> kvObject, final String type, final T value) {
+            final KvObject<?> kvObject, final String type, final Object value) {
         this(kvObject.getCollection(), kvObject.getKey(), type, value);
     }
 
     public EventStoreOperation(
-            final KvObject<?> kvObject, final String type, final T value, final long timestamp) {
+            final KvObject<?> kvObject, final String type, final Object value, final long timestamp) {
         this(kvObject.getCollection(), kvObject.getKey(), type, value, timestamp);
     }
 
