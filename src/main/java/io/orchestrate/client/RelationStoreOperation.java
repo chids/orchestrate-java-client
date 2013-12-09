@@ -22,7 +22,7 @@ import org.glassfish.grizzly.http.Method;
 import org.glassfish.grizzly.http.util.HttpStatus;
 
 // TODO document this
-public final class GraphStoreOperation extends AbstractOperation<Boolean> {
+public final class RelationStoreOperation extends AbstractOperation<Boolean> {
 
     private final String collection;
     private final String key;
@@ -30,7 +30,7 @@ public final class GraphStoreOperation extends AbstractOperation<Boolean> {
     private final String toKey;
     private final String kind;
 
-    public GraphStoreOperation(
+    public RelationStoreOperation(
             final String collection, final String key, final String kind, final String toCollection, final String toKey) {
         // TODO add input checking
         this.collection = collection;
@@ -40,7 +40,7 @@ public final class GraphStoreOperation extends AbstractOperation<Boolean> {
         this.kind = kind;
     }
 
-    public GraphStoreOperation(final KvObject<?> sourceObj, final String kind, final KvObject<?> toObj) {
+    public RelationStoreOperation(final KvObject<?> sourceObj, final String kind, final KvObject<?> toObj) {
         this(sourceObj.getCollection(), sourceObj.getKey(), kind, toObj.getCollection(), toObj.getKey());
     }
 

@@ -57,7 +57,7 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
      * <p>Equivalent to:
      * <pre>
      * {@code
-     * SearchOperation searchOp = SearchOperation.builder("myCollection", new MyConverter()).build();
+     * SearchOperation searchOp = SearchOperation.builder("myCollection", MyObject.class).build();
      * }
      * </pre>
      *
@@ -67,6 +67,12 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
      */
     public SearchOperation(final String collection, final Class<T> clazz) {
         this(builder(collection), clazz);
+    }
+
+    // TODO document this
+    public SearchOperation(
+            final String collection, final Class<T> clazz, final String query) {
+        this(builder(collection).query(query), clazz);
     }
 
     /**

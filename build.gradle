@@ -6,6 +6,16 @@ apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 
+// FIXME temporary
+    apply plugin: 'application'
+    mainClassName = 'io.orchestrate.client.main.Main'
+    dependencies.runtime group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.5'
+    run {
+        systemProperties [
+            System.getProperty('org.slf4j.simpleLogger.defaultLogLevel', 'trace')
+        ]
+    }
+
 def groovyVersion = 'groovy-2.1.8'
 
 group   = 'io.orchestrate'

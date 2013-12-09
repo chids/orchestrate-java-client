@@ -25,33 +25,43 @@ import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 
 // TODO document this
-public final class KvStoreOperation<T> extends AbstractOperation<KvMetadata> {
+public final class KvStoreOperation extends AbstractOperation<KvMetadata> {
 
     /**  */
     private final String collection;
     /**  */
     private final String key;
     /**  */
-    private final T value;
+    private final Object value;
     /**  */
     private final String currentRef;
     /**  */
     private final boolean ifAbsent;
 
     public KvStoreOperation(
-            final String collection, final String key, final T value) {
+            final String collection, final String key, final Object value) {
         this(collection, key, value, null, false);
     }
 
     public KvStoreOperation(
-            final String collection, final String key, final T value, final String currentRef) {
+            final String collection, final String key, final Object value, final boolean ifAbsent) {
+        this(collection, key, value, null, ifAbsent);
+    }
+
+    public KvStoreOperation(
+            final String collection, final String key, final Object value, final KvMetadata metadata) {
+        this(collection, key, value, metadata.getRef());
+    }
+
+    public KvStoreOperation(
+            final String collection, final String key, final Object value, final String currentRef) {
         this(collection, key, value, currentRef, false);
     }
 
     private KvStoreOperation(
             final String collection,
             final String key,
-            final T value,
+            final Object value,
             @Nullable final String currentRef,
             final boolean ifAbsent) {
         // TODO add input checking

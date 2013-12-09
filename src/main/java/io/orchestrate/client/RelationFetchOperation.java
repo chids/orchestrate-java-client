@@ -29,13 +29,13 @@ import java.util.Iterator;
 import java.util.List;
 
 // TODO document this
-public final class GraphFetchOperation extends AbstractOperation<Iterable<KvObject<String>>> {
+public final class RelationFetchOperation extends AbstractOperation<Iterable<KvObject<String>>> {
 
     private final String collection;
     private final String key;
     private final String[] kinds;
 
-    public GraphFetchOperation(
+    public RelationFetchOperation(
             final String collection, final String key, final String... kinds) {
         // TODO add input checking
         this.collection = collection;
