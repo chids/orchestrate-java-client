@@ -31,7 +31,7 @@ public final class GraphStoreOperation extends AbstractOperation<Boolean> {
     private final String kind;
 
     public GraphStoreOperation(
-            final String collection, final String key, final String toCollection, final String toKey, final String kind) {
+            final String collection, final String key, final String kind, final String toCollection, final String toKey) {
         // TODO add input checking
         this.collection = collection;
         this.key = key;
