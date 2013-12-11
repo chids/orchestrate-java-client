@@ -29,4 +29,13 @@ public interface OrchestrateFutureListener<T> {
      */
     void onComplete(final OrchestrateFuture<T> future);
 
+    /**
+     * Invoked when the operation associated with the {@link OrchestrateFuture}
+     * has failed.
+     *
+     * @param future The source {@link OrchestrateFuture} which called this
+     *               callback.
+     */
+    void onException(final OrchestrateFuture<T> future);
+
 }

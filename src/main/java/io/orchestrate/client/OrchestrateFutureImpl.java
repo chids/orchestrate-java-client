@@ -186,7 +186,11 @@ final class OrchestrateFutureImpl<T> implements OrchestrateFuture<T> {
 
         if (fireNow) {
             for (final OrchestrateFutureListener<T> listener : listeners) {
-                listener.onComplete(this);
+                if (exception != null) {
+                    listener.onException(this);
+                } else {
+                    listener.onComplete(this);
+                }
             }
         }
     }
