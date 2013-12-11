@@ -51,7 +51,7 @@ public final class Client {
     /** Initial API; has KV, Events, Search, and early Graph support. */
     public static final API V0 = API.v0;
     /** The shared JSON mapping handler. */
-    static final ObjectMapper MAPPER = new ObjectMapper();
+    static final ObjectMapper MAPPER = new ObjectMapper(); // FIXME this is a hack
 
     /**
      * The different versions of the Orchestrate.io service.
@@ -66,7 +66,8 @@ public final class Client {
     private final NIOTransport transport;
 
     /**
-     * Create a new {@code client} with the specified {@code apiKey}.
+     * Create a new {@code client} with the specified {@code apiKey} and default
+     * {@code JacksonMapper}.
      *
      * <p>Equivalent to:
      * <pre>
@@ -79,6 +80,28 @@ public final class Client {
      */
     public Client(final String apiKey) {
         this(builder(apiKey));
+    }
+
+    /**
+     * Create a new {@code client} with the specified {@code apiKey} and {@code
+     * objectMapper}.
+     *
+     * @param apiKey An API key for the Orchestrate.io service.
+     * @param objectMapper The Jackson JSON mapper to marshall data with.
+     */
+    public Client(final String apiKey, final ObjectMapper objectMapper) {
+        this(builder(apiKey).mapper(objectMapper));
+    }
+
+    /**
+     * Create a new {@code client} with the specified {@code apiKey} and {@code
+     * mapper}.
+     *
+     * @param apiKey An API key for the Orchestrate.io service.
+     * @param mapper The mapper to marshall data with.
+     */
+    public Client(final String apiKey, final JacksonMapper mapper) {
+        this(builder(apiKey).mapper(mapper));
     }
 
     /**
@@ -220,6 +243,8 @@ public final class Client {
         private int poolSize;
         /** The maximum size of the thread pool to use with the client. */
         private int maxPoolSize;
+        /** The configured JSON mapper. */
+        private JacksonMapper mapper;
 
         private Builder(final String apiKey) {
             assert (apiKey != null);
@@ -232,6 +257,7 @@ public final class Client {
             poolSize(0);
             // TODO benchmark this number
             maxPoolSize(Runtime.getRuntime().availableProcessors() * 15);
+            mapper(JacksonMapper.builder());
         }
 
         /**
@@ -312,6 +338,49 @@ public final class Client {
                 throw new IllegalArgumentException("'maxPoolSize' cannot be smaller than one.");
             }
             this.maxPoolSize = maxPoolSize;
+            return this;
+        }
+
+        /**
+         * The Jackson JSON {@code ObjectMapper} to use when marshalling data to
+         * and from the service, defaults to {@link io.orchestrate.client.JacksonMapper#builder()}.
+         *
+         * @param objectMapper A Jackson JSON {@code ObjectMapper}.
+         * @return This builder.
+         */
+        public Builder mapper(final ObjectMapper objectMapper) {
+            if (objectMapper == null) {
+                throw new IllegalArgumentException("'objectMapper' cannot be null.");
+            }
+            return mapper(JacksonMapper.builder(objectMapper));
+        }
+
+        /**
+         * A {@code Builder} used to build the {@code JacksonMapper} to use when
+         * marshalling data to and from the service.
+         *
+         * @param mapperBuilder A {@code JacksonMapper.Builder}.
+         * @return This builder.
+         */
+        public Builder mapper(final JacksonMapper.Builder mapperBuilder) {
+            if (mapperBuilder == null) {
+                throw new IllegalArgumentException("'mapperBuilder' cannot be null.");
+            }
+            return mapper(mapperBuilder.build());
+        }
+
+        /**
+         * A {@code JacksonMapper} to use when marshalling data to and from the
+         * service.
+         *
+         * @param mapper A {@code JacksonMapper}.
+         * @return This builder.
+         */
+        public Builder mapper(final JacksonMapper mapper) {
+            if (mapper == null) {
+                throw new IllegalArgumentException("'mapper' cannot be null.");
+            }
+            this.mapper = mapper;
             return this;
         }
 

@@ -6,16 +6,6 @@ apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 
-// FIXME temporary
-    apply plugin: 'application'
-    mainClassName = 'io.orchestrate.client.main.Main'
-    dependencies.runtime group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.5'
-    run {
-        systemProperties [
-            System.getProperty('org.slf4j.simpleLogger.defaultLogLevel', 'trace')
-        ]
-    }
-
 def groovyVersion = 'groovy-2.1.8'
 
 group   = 'io.orchestrate'
@@ -53,6 +43,7 @@ sourceSets {
 dependencies {
     def slf4jVersion   = '1.7.5'
     def grizzlyVersion = '2.3.7'
+    def jacksonVersion = '2.3.0'
 
     provided(
         [group: 'org.projectlombok', name: 'lombok', version: '1.12.2'],
@@ -61,11 +52,12 @@ dependencies {
     compile(
         [group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion],
         [group: 'org.glassfish.grizzly', name: 'grizzly-http', version: grizzlyVersion],
-        [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.3.0']
+        [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion]
     )
     testCompile(
         [group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.2.1'],
-        [group: 'org.spockframework', name: 'spock-core', version: '0.7-groovy-2.0']
+        [group: 'org.spockframework', name: 'spock-core', version: '0.7-groovy-2.0'],
+        [group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: jacksonVersion]
     )
     testRuntime(
         [group: 'org.slf4j', name: 'slf4j-simple', version: slf4jVersion]
