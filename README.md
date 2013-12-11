@@ -8,7 +8,7 @@ The client API is still in __flux__, it is not yet stable. While we'll endeavour
  to keep API-breaking changes to a minimum, you should expect that _at the moment_
  there may be some migration work necessary with new releases.
 
-## About
+### About
 
 The Orchestrate.io service is a platform for storing and querying data.
 
@@ -21,11 +21,11 @@ You can create an account by signing up and logging in at our [Dashboard](https:
 
 [https://dashboard.orchestrate.io](https://dashboard.orchestrate.io)
 
-## Getting Started
+### Getting Started
 
 The client library is available on [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22orchestrate-java-client%22).
 
-### Using [Gradle](http://www.gradle.org/)
+#### Using [Gradle](http://www.gradle.org/)
 
 ```groovy
 dependencies {
@@ -33,7 +33,7 @@ dependencies {
 }
 ```
 
-### Using Maven
+#### Using Maven
 
 ```xml
 <dependency>
@@ -43,14 +43,14 @@ dependencies {
 </dependency>
 ```
 
-## Example
+### Example
 
 The client API is designed around the concept of `operation`s you can execute on
  the Orchestrate.io service. The client library is entirely asynchronous and
  conforms to the [java.util.concurrent.Future](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Future.html)
  specification in the standard library.
 
-### Creating a Client
+#### Creating a Client
 
 You construct a client using the `API key` for your `Application` which can be
  found in the [Dashboard](https://dashboard.orchestrate.io/) (for help,
@@ -62,7 +62,7 @@ You construct a client using the `API key` for your `Application` which can be
 Client client = new Client("your api key");
 ```
 
-### Fetching Key-Value Data
+#### Fetching Key-Value Data
 
 For example, to fetch an object from a `collection` with a given `key`.
 
@@ -91,16 +91,16 @@ The client has operations for [Key-Value](http://orchestrate-io.github.io/orches
  and [Event](http://orchestrate-io.github.io/orchestrate-java-client/querying/#events)
  features from the Orchestrate.io service.
 
-### <a name="user-manual"></a> User Manual
+#### <a name="user-guide"></a> User Guide
 
-There's a [User Manual](http://orchestrate-io.github.io/orchestrate-java-client/)
+There's a [User Guide](http://orchestrate-io.github.io/orchestrate-java-client/)
  for the `client` with more code examples and details on tuning the library for
  your server environment.
 
 The Javadocs for the codebase is available
  [here](http://orchestrate-io.github.io/orchestrate-java-client/javadoc/latest).
 
-## Developer notes
+### Developer notes
 
 The client uses the [Grizzly framework](https://grizzly.java.net/) for
  processing HTTP requests and [Jackson JSON parser](http://wiki.fasterxml.com/JacksonHome)
@@ -110,7 +110,7 @@ The client uses the [Grizzly framework](https://grizzly.java.net/) for
 The codebase requires the [Gradle](http://gradle.org) build tool at version
  `1.6+` and the Java compiler at version `1.6.0` or greater.
 
-### Building the codebase
+#### Building the codebase
 
 A list of all possible build targets can be displayed by Gradle with
  `gradle tasks`.
@@ -122,16 +122,16 @@ It is recommended to run Gradle with the
  enabled to improve performance. e.g. `gradle --daemon` once the daemon is
  running it can be stopped with `gradle --stop`.
 
-### Building the documentation
+#### Building the documentation
 
-The documentation sources for the [User Manual](#user-manual) is in the `www`
+The documentation sources for the [User Manual](#user-guide) is in the `www`
  folder.
 
 The documentation can be built with [Middleman](http://middlemanapp.com/). To
  run the local server for viewing use `middleman server` and to build compiled
  code for deployment use `middleman build`.
 
-## Contribute
+### Contribute
 
 All contributions to the documentation and the codebase are very welcome and
  feel free to open issues on the tracker wherever the documentation needs
