@@ -174,7 +174,7 @@ public final class Client {
             httpHeaderBuilder.header(Header.IfMatch, value);
         }
 
-        execute(httpHeaderBuilder.build(), future);
+        execute(httpHeaderBuilder.build().httpContentBuilder().build(), future);
         return future;
     }
 
@@ -202,7 +202,7 @@ public final class Client {
         }
         httpHeaderBuilder.query(query);
 
-        execute(httpHeaderBuilder.build(), future);
+        execute(httpHeaderBuilder.build().httpContentBuilder().build(), future);
         return future;
     }
 
@@ -257,12 +257,13 @@ public final class Client {
             uri = uri.concat("/refs/").concat(kvFetchOp.getRef());
         }
 
-        final HttpRequestPacket.Builder httpHeaderBuilder = HttpRequestPacket
+        final HttpRequestPacket httpPacket = HttpRequestPacket
                 .builder()
                 .method(Method.GET)
-                .uri(uri);
+                .uri(uri)
+                .build();
 
-        execute(httpHeaderBuilder.build(), future);
+        execute(httpPacket.httpContentBuilder().build(), future);
         return future;
     }
 
@@ -320,12 +321,13 @@ public final class Client {
             uri = uri.concat("/").concat(kind);
         }
 
-        final HttpRequestPacket.Builder httpPacketBuilder = HttpRequestPacket
+        final HttpRequestPacket httpPacket = HttpRequestPacket
                 .builder()
                 .method(Method.GET)
-                .uri(uri);
+                .uri(uri)
+                .build();
 
-        execute(httpPacketBuilder.build(), future);
+        execute(httpPacket.httpContentBuilder().build(), future);
         return future;
     }
 
@@ -344,12 +346,13 @@ public final class Client {
                 .concat("/")
                 .concat(relationStoreOp.getToKey());
 
-        final HttpRequestPacket.Builder httpPacketBuilder = HttpRequestPacket
+        final HttpRequestPacket httpPacket = HttpRequestPacket
                 .builder()
                 .method(Method.PUT)
-                .uri(uri);
+                .uri(uri)
+                .build();
 
-        execute(httpPacketBuilder.build(), future);
+        execute(httpPacket.httpContentBuilder().build(), future);
         return future;
     }
 
@@ -362,18 +365,19 @@ public final class Client {
                 .concat("&limit=").concat(searchOp.getLimit() + "")
                 .concat("&offset=").concat(searchOp.getOffset() + "");
 
-        final HttpRequestPacket.Builder httpPacketBuilder = HttpRequestPacket
+        final HttpRequestPacket httpPacket = HttpRequestPacket
                 .builder()
                 .method(Method.GET)
                 .uri(searchOp.getCollection())
-                .query(query);
+                .query(query)
+                .build();
 
-        execute(httpPacketBuilder.build(), future);
+        execute(httpPacket.httpContentBuilder().build(), future);
         return future;
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void execute(final HttpPacket httpPacket, final OrchestrateFuture<T> future) {
+    private <T> void execute(final HttpContent httpPacket, final OrchestrateFuture<T> future) {
         final Connection connection;
         try {
             final Future<Connection> connectionFuture = newConnection();
