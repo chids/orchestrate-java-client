@@ -13,16 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.orchestrate.client;
 
 /**
- * An object that represents a failure to send a request from the {@code Client}.
+ * A high performance, asynchronous Java client to query the Orchestrate.io
+ * service.
+ *
+ * <p>A User Guide for the client can be found at:
+ * <a href="http://orchestrate-io.github.io/orchestrate-java-client/">
+ * http://orchestrate-io.github.io/orchestrate-java-client/</a>
  */
-@SuppressWarnings("serial")
-public final class ClientException extends RuntimeException {
-
-    ClientException(final Throwable t) {
-        super(t);
-    }
-
-}
+package io.orchestrate.client;

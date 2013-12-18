@@ -235,7 +235,12 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
             this.offset = searchOp.builder.offset;
         }
 
-        // TODO document this
+        /**
+         * The lucene query to make with this search request.
+         *
+         * @param luceneQuery The lucene query.
+         * @return This builder.
+         */
         public Builder query(final String luceneQuery) {
             if (luceneQuery == null) {
                 throw new IllegalArgumentException("'luceneQuery' cannot be null.");
@@ -247,7 +252,13 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
             return this;
         }
 
-        // TODO document this
+        /**
+         * The number of search results to get in this query, this value cannot
+         * exceed 100.
+         *
+         * @param limit The number of search results in this query.
+         * @return This builder.
+         */
         public Builder limit(final int limit) {
             if (limit < 0) {
                 throw new IllegalArgumentException("'limit' cannot be negative.");
@@ -262,7 +273,13 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
             return this;
         }
 
-        // TODO document this
+        /**
+         * The position in the results list to start retrieving results from,
+         * this is useful for paginating results.
+         *
+         * @param offset The position to start retrieving results from.
+         * @return This builder.
+         */
         public Builder offset(final int offset) {
             if (offset < 0) {
                 throw new IllegalArgumentException("'offset' cannot be negative.");

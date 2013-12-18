@@ -152,7 +152,12 @@ public final class Client {
         }
     }
 
-    // TODO document this
+    /**
+     * Executes the specified {@code deleteOp} on the Orchestrate.io service.
+     *
+     * @param deleteOp The delete operation to execute.
+     * @return A future for the response from this operation.
+     */
     public OrchestrateFuture<Boolean> execute(final DeleteOperation deleteOp) {
         final OrchestrateFuture<Boolean> future =
                 new OrchestrateFutureImpl<Boolean>(deleteOp);
@@ -178,7 +183,13 @@ public final class Client {
         return future;
     }
 
-    // TODO document this
+    /**
+     * Executes the specified {@code eventFetchOp} on the Orchestrate.io service.
+     *
+     * @param eventFetchOp The event fetch operation to execute.
+     * @param <T> The type to deserialize the results to.
+     * @return A future for the response from this operation.
+     */
     public <T> OrchestrateFuture<Iterable<Event<T>>> execute(final EventFetchOperation<T> eventFetchOp) {
         final OrchestrateFuture<Iterable<Event<T>>> future =
                 new OrchestrateFutureImpl<Iterable<Event<T>>>(eventFetchOp);
@@ -206,7 +217,12 @@ public final class Client {
         return future;
     }
 
-    // TODO document this
+    /**
+     * Executes the specified {@code eventStoreOp} on the Orchestrate.io service.
+     *
+     * @param eventStoreOp The event store operation to execute.
+     * @return A future for the response from this operation.
+     */
     public OrchestrateFuture<Boolean> execute(final EventStoreOperation eventStoreOp) {
         final OrchestrateFutureImpl<Boolean> future =
                 new OrchestrateFutureImpl<Boolean>(eventStoreOp);
@@ -245,7 +261,13 @@ public final class Client {
         return future;
     }
 
-    // TODO document this
+    /**
+     * Executes the specified {@code kvFetchOp} on the Orchestrate.io service.
+     *
+     * @param kvFetchOp The KV fetch operation to execute.
+     * @param <T> The type to deserialize the results to.
+     * @return The future for the response from this operation.
+     */
     public <T> OrchestrateFuture<KvObject<T>> execute(final KvFetchOperation<T> kvFetchOp) {
         final OrchestrateFuture<KvObject<T>> future =
                 new OrchestrateFutureImpl<KvObject<T>>(kvFetchOp);
@@ -267,7 +289,12 @@ public final class Client {
         return future;
     }
 
-    // TODO document this
+    /**
+     * Executes the specified {@code kvStoreOp} on the Orchestrate.io service.
+     *
+     * @param kvStoreOp The KV store operation to execute.
+     * @return The future for the response from this operation.
+     */
     public OrchestrateFuture<KvMetadata> execute(final KvStoreOperation kvStoreOp) {
         final OrchestrateFutureImpl<KvMetadata> future =
                 new OrchestrateFutureImpl<KvMetadata>(kvStoreOp);
@@ -307,7 +334,13 @@ public final class Client {
         return future;
     }
 
-    // TODO document this
+    /**
+     * Executes the specified {@code relationFetchOp} on the Orchestrate.io
+     * service.
+     *
+     * @param relationFetchOp The relation fetch operation to execute.
+     * @return The future for the response from this operation.
+     */
     public OrchestrateFuture<Iterable<KvObject<String>>> execute(
             final RelationFetchOperation relationFetchOp) {
         final OrchestrateFuture<Iterable<KvObject<String>>> future =
@@ -331,7 +364,13 @@ public final class Client {
         return future;
     }
 
-    // TODO document this
+    /**
+     * Executes the specified {@code relationStoreOp} on the Orchestrate.io
+     * service.
+     *
+     * @param relationStoreOp The relation store operation to execute.
+     * @return The future for the response from this operation.
+     */
     public OrchestrateFuture<Boolean> execute(final RelationStoreOperation relationStoreOp) {
         final OrchestrateFuture<Boolean> future =
                 new OrchestrateFutureImpl<Boolean>(relationStoreOp);
@@ -356,7 +395,13 @@ public final class Client {
         return future;
     }
 
-    // TODO document this
+    /**
+     * Executes the specified {@code searchOp} on the Orchestrate.io service.
+     *
+     * @param searchOp The search operation to execute.
+     * @param <T> The type to deserialize the results to.
+     * @return The future for the response from this operation.
+     */
     public <T> OrchestrateFuture<SearchResults<T>> execute(final SearchOperation<T> searchOp) {
         final OrchestrateFuture<SearchResults<T>> future =
                 new OrchestrateFutureImpl<SearchResults<T>>(searchOp);
