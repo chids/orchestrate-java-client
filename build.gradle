@@ -3,13 +3,16 @@
  */
 
 apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'signing'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 
-def groovyVersion = 'groovy-2.1.8'
-
 group   = 'io.orchestrate'
-version = '0.0.1-SNAPSHOT'
+version = '0.1.0-SNAPSHOT'
+
+def groovyVersion = 'groovy-2.1.8'
+def isReleaseVersion = !version.endsWith('SNAPSHOT')
 
 plugins.withType(JavaPlugin) {
     sourceCompatibility = 1.6
@@ -31,6 +34,7 @@ repositories {
 }
 
 configurations {
+    deployerJars
     provided
     testProvided { extendsFrom provided }
 }
@@ -44,6 +48,8 @@ dependencies {
     def slf4jVersion   = '1.7.5'
     def grizzlyVersion = '2.3.7'
     def jacksonVersion = '2.3.0'
+
+    deployerJars group: 'org.apache.maven.wagon', name: 'wagon-ssh', version: '2.5'
 
     provided(
         [group: 'org.projectlombok', name: 'lombok', version: '1.12.2'],
@@ -70,7 +76,7 @@ test {
 
 jar {
     manifest {
-        attributes 'Implementation-Title': project.name,
+        attributes 'Implementation-Title': 'orchestrate-client',
                    'Implementation-Version': project.version,
                    'Created-By': 'Gradle ' + gradle.gradleVersion,
                    'Build-Jdk': System.properties['java.version'],
@@ -81,6 +87,81 @@ jar {
 javadoc {
     classpath += configurations.provided
 }
+
+task sourceJar(type: Jar, dependsOn: classes) {
+    baseName = 'orchestrate-client'
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    baseName = 'orchestrate-client'
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
+}
+
+signing {
+    if (isReleaseVersion) {
+        sign configurations.archives
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { deployment ->
+                signing.signPom(deployment)
+            }
+
+            if (isReleaseVersion) {
+                repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
+            } else {
+                repository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
+            }
+
+            pom.project {
+                groupId project.group
+                artifactId 'orchestrate-client'
+                version project.version
+                packaging 'jar'
+                name 'Orchestrate Java Client'
+                description "A high performance, asynchronous Java client to query the Orchestrate.io service."
+                url 'https://github.com/orchestrate-io/orchestrate-java-client'
+                inceptionYear '2013'
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+                scm {
+                    url 'https://github.com/orchestrate-io/orchestrate-java-client'
+                    connection 'scm:git://github.com/orchestrate-io/orchestrate-java-client.git'
+                    developerConnection 'scm:git@github.com:orchestrate-io/orchestrate-java-client.git'
+                }
+                developers {
+                    developer {
+                        id 'novabyte'
+                        name 'Chris Molozian'
+                        email 'chris@orchestrate.io'
+                    }
+                }
+            }
+        }
+    }
+}
+uploadArchives.dependsOn ':build'
 
 idea {
     module {
