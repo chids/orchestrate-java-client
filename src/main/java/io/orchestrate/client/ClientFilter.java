@@ -107,9 +107,9 @@ final class ClientFilter extends BaseFilter {
     @Override
     public NextAction handleWrite(final FilterChainContext ctx) throws IOException {
         final Object message = ctx.getMessage();
-        assert (message instanceof HttpContent);
+        assert (message instanceof HttpPacket);
 
-        final HttpContent request = (HttpContent) message;
+        final HttpPacket request = (HttpPacket) message;
         final HttpRequestPacket httpHeader = (HttpRequestPacket) request.getHttpHeader();
 
         // add version information
