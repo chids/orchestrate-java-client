@@ -90,14 +90,17 @@ final class ClientFilter extends BaseFilter {
         final HttpStatus status = ((HttpResponsePacket) httpHeader).getHttpStatus();
         final int statusCode = status.getStatusCode();
         switch (statusCode) {
-            case 500:
-                future.setException(new RuntimeException()); // FIXME
-                break;
-            default:
+            case 200:   // intentional fallthrough
+            case 201:   // intentional fallthrough
+            case 204:
                 // TODO is it possible to use a buffer with Jackson
                 final Object result = future.getOperation()
                         .fromResponse(statusCode, httpHeader, content, mapper);
                 future.setResult(result);
+                break;
+            default:
+                final String requestId = httpHeader.getHeader("x-orchestrate-req-id");
+                future.setException(new RequestException(statusCode, content, requestId));
         }
 
         ctx.setMessage(null);
