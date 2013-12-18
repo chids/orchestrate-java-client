@@ -17,7 +17,7 @@ Using Orchestrate.io you can focus on building applications and adding new
  ways to query the data and keeping the service highly available to support your
  applications as they grow.
 
-You can create an account by signing up and logging in at our [Dashboard](https://dashboard.orchestrate.io).
+You can create an account by signing up at our [Dashboard](https://dashboard.orchestrate.io).
 
 [https://dashboard.orchestrate.io](https://dashboard.orchestrate.io)
 
@@ -77,7 +77,7 @@ Future<KvObject<MyObj>> future = client.execute(kvFetchOp);
 KvObject<MyObj> kvObject = future.get(3, TimeUnit.SECONDS);
 
 // check the data exists
-if (result == null) {
+if (kvObject == null) {
     System.out.println("'someKey' does not exist.";
 } else {
     MyObj data = kvObject.getValue();
@@ -97,7 +97,7 @@ There's a [User Guide](http://orchestrate-io.github.io/orchestrate-java-client/)
  for the `client` with more code examples and details on tuning the library for
  your server environment.
 
-The Javadocs for the codebase is available
+The Javadocs for the codebase are available
  [here](http://orchestrate-io.github.io/orchestrate-java-client/javadoc/latest).
 
 ### Developer notes
