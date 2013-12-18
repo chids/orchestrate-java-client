@@ -15,60 +15,179 @@
  */
 package io.orchestrate.client;
 
-import org.glassfish.grizzly.http.*;
-import org.glassfish.grizzly.http.util.HttpStatus;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.glassfish.grizzly.http.HttpHeader;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 
-// TODO document this
+/**
+ * A delete operation to the Orchestrate.io service.
+ *
+ * <p>Usage:
+ * <pre>
+ * {@code
+ * DeleteOperation deleteOp = new DeleteOperation("myCollection", "someKey");
+ * Future<Boolean> futureResult = client.execute(deleteOp);
+ * Boolean result = futureResult.get();
+ * if (result)
+ *     System.out.println("Successfully deleted 'someKey'.");
+ * }
+ * </pre>
+ *
+ * @see <a href="http://orchestrate-io.github.io/orchestrate-java-client/querying/#delete-data">http://orchestrate-io.github.io/orchestrate-java-client/querying/#delete-data</a>
+ */
+@ToString(callSuper=false)
+@EqualsAndHashCode(callSuper=false)
 public final class DeleteOperation extends AbstractOperation<Boolean> {
 
-    /**  */
+    /** The collection to delete. */
     private final String collection;
-    /**  */
+    /** The key in the collection to delete. */
     private final String key;
+    /** The current version of the object stored with the key. */
+    private final String currentRef;
 
+    /**
+     * Create a new {@code DeleteOperation} to remove all objects from the
+     * specified {@code collection}.
+     *
+     * @param collection The name of collection to delete.
+     */
     public DeleteOperation(final String collection) {
-        this(collection, null);
+        if (collection == null) {
+            throw new IllegalArgumentException("'collection' cannot be null.");
+        }
+        if (collection.length() < 1) {
+            throw new IllegalArgumentException("'collection' cannot be empty.");
+        }
+        this.collection = collection;
+        this.key = null;
+        this.currentRef = null;
     }
 
-    public DeleteOperation(final String collection, @Nullable final String key) {
-        // TODO add input checking
+    /**
+     * Create a new {@code DeleteOperation} to remove the object with the
+     * specified {@code key} from the {@code collection}.
+     *
+     * @param collection The name of the collection containing the key to delete.
+     * @param key The name of the key to delete.
+     */
+    public DeleteOperation(final String collection, final String key) {
+        if (collection == null) {
+            throw new IllegalArgumentException("'collection' cannot be null.");
+        }
+        if (collection.length() < 1) {
+            throw new IllegalArgumentException("'collection' cannot be empty.");
+        }
+        if (key == null) {
+            throw new IllegalArgumentException("'key' cannot be null.");
+        }
+        if (key.length() < 1) {
+            throw new IllegalArgumentException("'key' cannot be empty.");
+        }
         this.collection = collection;
         this.key = key;
+        this.currentRef = null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    HttpContent encode() {
-        String uri = collection;
-        if (key != null) {
-            uri = uri.concat("/").concat(key);
-        }
+    /**
+     * Create a new {@code DeleteOperation} to remove the object with the
+     * specified {@code key} from the {@code collection} if and only if the
+     * ref from the {@code metadata} matches the current stored ref.
+     *
+     * @param collection The name of the collection containing the key to delete.
+     * @param key The name of the key to delete.
+     * @param metadata The metadata about the current object stored to this key.
+     */
+    public DeleteOperation(
+            final String collection, final String key, final KvMetadata metadata) {
+        this(collection, key, metadata.getRef());
+    }
 
-        final HttpRequestPacket.Builder httpHeaderBuilder = HttpRequestPacket.builder()
-                .method(Method.DELETE)
-                .uri(uri);
+    /**
+     * Create a new {@code DeleteOperation} to remove the object with the
+     * specified {@code key} from the {@code collection} if and only if the
+     * {@code currentRef} matches the current stored ref.
+     *
+     * @param collection The name of the collection containing the key to delete.
+     * @param key The name of the key to delete.
+     * @param currentRef The ref of the last known object stored to this key.
+     */
+    public DeleteOperation(
+            final String collection, final String key, final String currentRef) {
+        if (collection == null) {
+            throw new IllegalArgumentException("'collection' cannot be null.");
+        }
+        if (collection.length() < 1) {
+            throw new IllegalArgumentException("'collection' cannot be empty.");
+        }
         if (key == null) {
-            httpHeaderBuilder.query("force=true");
+            throw new IllegalArgumentException("'key' cannot be null.");
         }
-        final HttpRequestPacket httpHeader = httpHeaderBuilder.build();
-
-        return httpHeader.httpContentBuilder()
-                .httpHeader(httpHeader)
-                .build();
+        if (key.length() < 1) {
+            throw new IllegalArgumentException("'key' cannot be empty.");
+        }
+        this.collection = collection;
+        this.key = key;
+        this.currentRef = currentRef;
     }
 
     /** {@inheritDoc} */
     @Override
-    Boolean decode(final HttpContent content, final HttpHeader header, final HttpStatus status) {
-        switch (status.getStatusCode()) {
-            case 204:
-                return Boolean.TRUE;
-            default:
-                // FIXME do better with this error handling
-                throw new RuntimeException();
-        }
+    Boolean fromResponse(final int status, final HttpHeader httpHeader, final String json, final JacksonMapper mapper)
+            throws IOException {
+        return (status == 204);
+    }
+
+    /**
+     * Returns the collection from this operation.
+     *
+     * @return The collection from this operation.
+     */
+    public String getCollection() {
+        return collection;
+    }
+
+    /**
+     * Returns the key from this operation.
+     *
+     * @return The key from this operation, may be {@code null}.
+     * @see #hasKey()
+     */
+    @Nullable
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Returns the current "ref" from this operation.
+     *
+     * @return The current "ref" from this operation, may be {@code null}.
+     * @see #hasCurrentRef()
+     */
+    @Nullable
+    public String getCurrentRef() {
+        return currentRef;
+    }
+
+    /**
+     * Returns whether a key was supplied to this operation.
+     *
+     * @return {@code true} if a key was supplied to the operation.
+     */
+    public boolean hasKey() {
+        return (key != null);
+    }
+
+    /**
+     * Returns whether a "ref" was supplied to this operation.
+     *
+     * @return {@code true} if a "ref" was supplied to the operation.
+     */
+    public boolean hasCurrentRef() {
+        return (currentRef != null);
     }
 
 }

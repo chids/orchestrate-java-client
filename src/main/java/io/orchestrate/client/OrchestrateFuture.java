@@ -19,11 +19,20 @@ import java.util.concurrent.Future;
 
 /**
  * A listenable future, based on {@link Future}.
+ *
+ * @param <T> The type of the future result.
  */
 public interface OrchestrateFuture<T> extends Future<T> {
 
     /**
-     * Adds the specified {@code listener} to this future.
+     * Return the operation for this future.
+     *
+     * @return The operation for this future.
+     */
+    AbstractOperation<T> getOperation();
+
+    /**
+     * Add the specified {@code listener} to this future.
      *
      * <p>The listener is notified when this future {@link #isDone()}. If the
      * future is already completed, the listener is notified immediately.
@@ -33,7 +42,7 @@ public interface OrchestrateFuture<T> extends Future<T> {
     void addListener(final OrchestrateFutureListener<T> listener);
 
     /**
-     * Removes the specified {@code listener} from this future.
+     * Remove the specified {@code listener} from this future.
      *
      * <p>The listener is no longer notified when this future {@link #isDone()}.
      * If the listener is not associated with this future, this method does

@@ -15,13 +15,12 @@
  */
 package io.orchestrate.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.glassfish.grizzly.http.*;
-import org.glassfish.grizzly.http.util.HttpStatus;
+import org.glassfish.grizzly.http.HttpHeader;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import java.util.List;
  * <p>Usage:
  * <pre>
  * {@code
- * SearchOperation searchOp = SearchOperation.builder("myCollection")
+ * SearchOperation<MyObject> searchOp = SearchOperation.builder("myCollection")
  *         .query("*")  // a lucene-style query
  *         .limit(10)   // default
  *         .offset(0)   // default
@@ -48,31 +47,36 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
 
     /** The builder for this search operation. */
     private final Builder builder;
-    /** The converter to deserialize the JSON results with. */
-    private final Class<T> clazz;
+    /** Type information for marshalling objects at runtime. */
+    protected final TypeReference<T> genericType;
 
     /**
-     * Create a search operation on the specified {@code collection}.
+     * Create a new {@code SearchOperation} on the specified {@code collection}.
      *
      * <p>Equivalent to:
      * <pre>
      * {@code
-     * SearchOperation searchOp = SearchOperation.builder("myCollection", MyObject.class).build();
+     * SearchOperation searchOp = SearchOperation.builder("myCollection").build();
      * }
      * </pre>
      *
      * @param collection The collection to search.
-     * @param
      * @see Builder#LUCENE_STAR_QUERY
      */
-    public SearchOperation(final String collection, final Class<T> clazz) {
-        this(builder(collection), clazz);
+    public SearchOperation(final String collection) {
+        this(builder(collection));
     }
 
-    // TODO document this
+    /**
+     * Create a new {@code SearchOperation} on the specified {@code collection}
+     * using the lucene {@code query}.
+     *
+     * @param collection The collection to search.
+     * @param query The lucene query to run.
+     */
     public SearchOperation(
-            final String collection, final Class<T> clazz, final String query) {
-        this(builder(collection).query(query), clazz);
+            final String collection, final String query) {
+        this(builder(collection).query(query));
     }
 
     /**
@@ -80,81 +84,88 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
      *
      * @param builder The builder used to configure this search operation.
      */
-    private SearchOperation(final Builder builder, final Class<T> clazz) {
+    private SearchOperation(final Builder builder) {
         assert (builder != null);
 
         this.builder = builder;
-        this.clazz = clazz;
+        this.genericType = new TypeReference<T>() {};
     }
 
     /** {@inheritDoc} */
     @Override
-    HttpContent encode() {
-        final String query = "query=".concat(builder.query)
-                .concat("&limit=").concat(Integer.toString(builder.limit))
-                .concat("&offset=").concat(Integer.toString(builder.offset));
+    SearchResults<T> fromResponse(
+            final int status, final HttpHeader httpHeader, final String json, final JacksonMapper mapper)
+            throws IOException {
+        assert (status == 200);
 
-        final HttpRequestPacket httpHeader = HttpRequestPacket.builder()
-                .method(Method.GET)
-                .uri(builder.collection)
-                .query(query)
-                .build();
-        return httpHeader.httpContentBuilder()
-                .httpHeader(httpHeader)
-                .build();
-    }
+        final ObjectMapper objectMapper = mapper.getMapper();
+        final JsonNode jsonNode = objectMapper.readTree(json);
 
-    /** {@inheritDoc} */
-    @Override
-    SearchResults<T> decode(final HttpContent content, final HttpHeader header, final HttpStatus status) {
-        switch (status.getStatusCode()) {
-            case 200:
-                final JsonNode jsonNode;
-                try {
-                    jsonNode = Client.MAPPER.readTree(content.getContent().toStringContent());
-                } catch (final IOException e) {
-                    throw new ConversionException(e);
-                }
+        final int totalCount = jsonNode.get("total_count").asInt();
+        final int count = jsonNode.get("count").asInt();
+        final List<Result<T>> results = new ArrayList<Result<T>>(count);
 
-                final int totalCount = jsonNode.get("total_count").asInt();
-                final int count = jsonNode.get("count").asInt();
+        final Iterator<JsonNode> iter = jsonNode.get("results").elements();
+        while (iter.hasNext()) {
+            final JsonNode result = iter.next();
 
-                final List<Result<T>> results = new ArrayList<Result<T>>(count);
-                final Iterator<JsonNode> iter = jsonNode.get("results").elements();
-                while (iter.hasNext()) {
-                    final JsonNode result = iter.next();
+            // parse the PATH structure (e.g.):
+            // {"collection":"coll","key":"aKey","ref":"someRef"}
+            final JsonNode path = result.get("path");
+            final String collection = path.get("collection").asText();
+            final String key = path.get("key").asText();
+            final String ref = path.get("ref").asText();
+            final KvMetadata metadata = new KvMetadata(collection, key, ref);
 
-                    // parse the PATH structure (e.g.):
-                    // {"collection":"coll","key":"aKey","ref":"someRef"}
-                    final JsonNode path = result.get("path");
-                    final String collection = path.get("collection").asText();
-                    final String key = path.get("key").asText();
-                    final String ref = path.get("ref").asText();
-                    final KvMetadata metadata = new KvMetadata(collection, key, ref);
+            // parse result structure (e.g.):
+            // {"path":{...},"value":{},"score":1.0}
+            final double score = result.get("score").asDouble();
+            final JsonNode valueNode = result.get("value");
+            final String rawValue = valueNode.toString();
 
-                    // parse result structure (e.g.):
-                    // {"path":{...},"value":{},"score":1.0}
-                    final double score = result.get("score").asDouble();
-                    final JsonNode valueNode = result.get("value");
-                    final String rawValue = valueNode.toString();
+            final T value = objectMapper.readValue(rawValue, genericType);
+            final KvObject<T> kvObject = new KvObject<T>(metadata, value, rawValue);
 
-                    final T value;
-                    try {
-                        value = Client.MAPPER.treeToValue(valueNode, clazz);
-                    } catch (final JsonProcessingException e) {
-                        throw new ConversionException(e);
-                    }
-
-                    final KvObject<T> kvObject = new KvObject<T>(metadata, value, rawValue);
-
-                    results.add(new Result<T>(kvObject, score));
-                }
-
-                return new SearchResults<T>(results, totalCount);
-            default:
-                // FIXME do better with this error handling
-                throw new RuntimeException();
+            results.add(new Result<T>(kvObject, score));
         }
+
+        return new SearchResults<T>(results, totalCount);
+    }
+
+    /**
+     * Returns the collection from this operation.
+     *
+     * @return The collection from this operation.
+     */
+    public String getCollection() {
+        return builder.collection;
+    }
+
+    /**
+     * Returns the Lucene query from this operation.
+     *
+     * @return The Lucene query from this operation.
+     */
+    public String getQuery() {
+        return builder.query;
+    }
+
+    /**
+     * Returns the limit from this operation.
+     *
+     * @return The limit from this operation.
+     */
+    public int getLimit() {
+        return builder.limit;
+    }
+
+    /**
+     * Returns the offset from this operation.
+     *
+     * @return The offset from this operation.
+     */
+    public int getOffset() {
+        return builder.offset;
     }
 
     /**
@@ -261,23 +272,12 @@ public final class SearchOperation<T> extends AbstractOperation<SearchResults<T>
         }
 
         /**
-         * Creates a new {@code SearchOperation}, search results are returned
-         * as raw JSON.
-         *
-         * @return A new {@link SearchOperation}.
-         */
-        public SearchOperation<String> build() {
-            return new SearchOperation<String>(this, String.class);
-        }
-
-        /**
          * Creates a new {@code SearchOperation}.
          *
-         * @param clazz The converter to deserialize search results with.
          * @return A new {@link SearchOperation}.
          */
-        public <T> SearchOperation<T> build(final Class<T> clazz) {
-            return new SearchOperation<T>(this, clazz);
+        public <T> SearchOperation<T> build() {
+            return new SearchOperation<T>(this);
         }
 
     }

@@ -15,60 +15,104 @@
  */
 package io.orchestrate.client;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import org.glassfish.grizzly.http.HttpContent;
+import lombok.EqualsAndHashCode;
 import org.glassfish.grizzly.http.HttpHeader;
-import org.glassfish.grizzly.http.util.HttpStatus;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A query operation to the Orchestrate.io service.
  *
- * @param <T> The type to deserialize the result of this operation to.
+ * @param <T> The type to result the result of this operation to.
  */
+@EqualsAndHashCode
 abstract class AbstractOperation<T> {
 
-    /** A future for the result of this operation. */
-    @Getter(AccessLevel.PACKAGE)
-    private final OrchestrateFutureImpl<T> future;
+    /** The list of listeners for the operation's future. */
+    private final List<OrchestrateFutureListener<T>> listeners;
 
     AbstractOperation() {
-        future = new OrchestrateFutureImpl<T>();
+        listeners = new LinkedList<OrchestrateFutureListener<T>>();
     }
 
     /**
-     * Encodes this message as a HTTP request.
+     * Constructs the result type {@code T} from the response.
      *
-     * @return The HTTP request object for this message.
+     * @param status The status code from the response.
+     * @param httpHeader The HTTP header from the response.
+     * @param json The response content.
+     * @param mapper The mapper to use when marshalling objects from JSON.
+     * @return The result type of this operation.
+     * @throws IOException If there was a problem processing the response.
      */
-    abstract HttpContent encode();
-
-    /**
-     * Decodes the HTTP response to the type {@code T} of this message.
-     *
-     * @return The result type of this message.
-     */
-    abstract T decode(final HttpContent content, final HttpHeader header, final HttpStatus status);
+    abstract T fromResponse(
+            final int status, final HttpHeader httpHeader, final String json, final JacksonMapper mapper)
+            throws IOException;
 
     /**
      * Adds the specified {@code listener} to the future for this operation.
      *
      * @param listener The listener to notify when the future for this operation
      *                 completes.
-     * @see OrchestrateFuture#addListener(OrchestrateFutureListener)
+     * @see io.orchestrate.client.OrchestrateFuture#addListener(OrchestrateFutureListener)
      */
     public final void addListener(final OrchestrateFutureListener<T> listener) {
-        future.addListener(listener);
+        addListener(listener);
+    }
+
+    /**
+     * Adds the specified {@code listeners} to the future for this operation.
+     *
+     * @param listeners The listeners to notify when the future for this operation
+     *                  completes.
+     * @see io.orchestrate.client.OrchestrateFuture#addListener(OrchestrateFutureListener)
+     */
+    public final void addListener(final OrchestrateFutureListener<T>... listeners) {
+        if (listeners == null) {
+            throw new IllegalArgumentException("'listeners' cannot be null.");
+        }
+        if (listeners.length < 1) {
+            throw new IllegalArgumentException("'listeners' cannot be empty.");
+        }
+        Collections.addAll(this.listeners, listeners);
+    }
+
+    /**
+     * Returns the list of listeners for this operation's future.
+     *
+     * @return The list of listeners for this operation's future.
+     */
+    public final List<OrchestrateFutureListener<T>> getListeners() {
+        return Collections.unmodifiableList(listeners);
     }
 
     /**
      * Removes the specified {@code listener} to the future for this operation.
      *
      * @param listener The listener to remove from the future for this operation.
-     * @see OrchestrateFuture#removeListener(OrchestrateFutureListener)
+     * @see io.orchestrate.client.OrchestrateFuture#removeListener(OrchestrateFutureListener)
      */
     public final void removeListener(final OrchestrateFutureListener<T> listener) {
-        future.removeListener(listener);
+        removeListener(listener);
+    }
+
+    /**
+     * Removes the specified {@code listeners} to the future for this operation.
+     *
+     * @param listeners The listeners to remove from the future for this operation.
+     * @see io.orchestrate.client.OrchestrateFuture#removeListener(OrchestrateFutureListener)
+     */
+    public final void removeListener(final OrchestrateFutureListener<T>... listeners) {
+        if (listeners == null) {
+            throw new IllegalArgumentException("'listeners' cannot be null.");
+        }
+        if (listeners.length < 1) {
+            throw new IllegalArgumentException("'listeners' cannot be empty.");
+        }
+        Collections.addAll(this.listeners, listeners);
     }
 
 }

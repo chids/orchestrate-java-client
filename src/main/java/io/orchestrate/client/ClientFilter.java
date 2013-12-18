@@ -42,7 +42,7 @@ final class ClientFilter extends BaseFilter {
     public static final String HTTP_RESPONSE_ATTR = "orchestrate-client-response";
     /** The attribute for the HTTP response. */
     @Getter(AccessLevel.PACKAGE)
-    private final Attribute<AbstractOperation> httpResponseAttr;
+    private final Attribute<OrchestrateFutureImpl> httpResponseAttr;
 
     /** The header value to authenticate with the Orchestrate.io service */
     private final String authHeaderValue;
@@ -50,14 +50,17 @@ final class ClientFilter extends BaseFilter {
     private final String host;
     /** The version of the Orchestrate.io API to use. */
     private final String version;
+    /** The mapper to use when deserializing responses from JSON. */
+    private final JacksonMapper mapper;
 
-    ClientFilter(final String host, final String apiKey, final String version) {
+    ClientFilter(final String host, final String apiKey, final String version, final JacksonMapper mapper) {
         assert (host != null);
         assert (host.length() > 0);
         assert (apiKey != null);
         assert (apiKey.length() > 0);
         assert (version != null);
         assert (version.length() > 0);
+        assert (mapper != null);
 
         this.httpResponseAttr =
                 DEFAULT_ATTRIBUTE_BUILDER.createAttribute(HTTP_RESPONSE_ATTR);
@@ -65,6 +68,7 @@ final class ClientFilter extends BaseFilter {
                 "Basic ".concat(Base64Utils.encodeToString(apiKey.getBytes(), true));
         this.host = host;
         this.version = version;
+        this.mapper = mapper;
     }
 
     @SuppressWarnings("unchecked")
@@ -76,14 +80,25 @@ final class ClientFilter extends BaseFilter {
             return ctx.getInvokeAction();
         }
 
-        final HttpContent content = (HttpContent) object;
-        log.info("{}", content.getClass());
-        log.info("Received content: {}", content.getHttpHeader());
-        final AbstractOperation message =
+        final HttpContent httpContent = (HttpContent) object;
+        final HttpHeader httpHeader = httpContent.getHttpHeader();
+        final String content = httpContent.getContent().toStringContent();
+        log.info("Received content: {}", httpHeader);
+        final OrchestrateFutureImpl future =
                 httpResponseAttr.get(ctx.getConnection().getAttributes());
 
-        final HttpStatus status = ((HttpResponsePacket) content.getHttpHeader()).getHttpStatus();
-        message.getFuture().setResult(message.decode(content, content.getHttpHeader(), status));
+        final HttpStatus status = ((HttpResponsePacket) httpHeader).getHttpStatus();
+        final int statusCode = status.getStatusCode();
+        switch (statusCode) {
+            case 500:
+                future.setException(new RuntimeException()); // FIXME
+                break;
+            default:
+                // TODO is it possible to use a buffer with Jackson
+                final Object result = future.getOperation()
+                        .fromResponse(statusCode, httpHeader, content, mapper);
+                future.setResult(result);
+        }
 
         ctx.setMessage(null);
         return ctx.getStopAction();

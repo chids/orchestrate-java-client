@@ -17,27 +17,74 @@ package io.orchestrate.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.glassfish.grizzly.http.HttpContent;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.glassfish.grizzly.http.HttpHeader;
-import org.glassfish.grizzly.http.HttpRequestPacket;
-import org.glassfish.grizzly.http.Method;
-import org.glassfish.grizzly.http.util.HttpStatus;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-// TODO document this
+/**
+ * Fetch objects related to a key in the Orchestrate.io service.
+ *
+ * <p>Usage:
+ * <pre>
+ * {@code
+ * RelationFetchOperation relationFetchOp =
+ *         new RelationFetchOperation("myCollection", "someKey", "relationName");
+ * Future<Iterable<KvObject<String>>> futureResult = client.execute(relationFetchOp);
+ * Iterable<KvObject<String>> results = futureResult.get();
+ * for (KvObject<String> result : results)
+ *     System.out.println(result.getValue());
+ * }
+ * </pre>
+ */
+@ToString(callSuper=false)
+@EqualsAndHashCode(callSuper=false)
 public final class RelationFetchOperation extends AbstractOperation<Iterable<KvObject<String>>> {
 
+    /** The collection containing the key. */
     private final String collection;
+    /** The key to query for kinds. */
     private final String key;
+    /** The kinds to traverse in the query. */
     private final String[] kinds;
 
+    /**
+     * Create a new {@code RelationFetchOperation} to get all objects that have
+     * the sequence of {@code kinds} from the {@code key} in the
+     * {@code collection}.
+     *
+     * @param collection The collection containing the key.
+     * @param key The key to fetch related objects from.
+     * @param kinds The name of the relationships to traverse to the related
+     *                  objects.
+     */
     public RelationFetchOperation(
             final String collection, final String key, final String... kinds) {
-        // TODO add input checking
+        if (collection == null) {
+            throw new IllegalArgumentException("'collection' cannot be null.");
+        }
+        if (collection.length() < 1) {
+            throw new IllegalArgumentException("'collection' cannot be empty.");
+        }
+        if (key == null) {
+            throw new IllegalArgumentException("'key' cannot be null.");
+        }
+        if (key.length() < 1) {
+            throw new IllegalArgumentException("'key' cannot be empty.");
+        }
+        if (kinds.length < 1) {
+            throw new IllegalArgumentException("'kinds' cannot be empty.");
+        }
+        for (final String kind : kinds) {
+            if (kind.length() < 1) {
+                throw new IllegalArgumentException("'kinds' cannot contain empty values.");
+            }
+        }
         this.collection = collection;
         this.key = key;
         this.kinds = kinds;
@@ -45,58 +92,62 @@ public final class RelationFetchOperation extends AbstractOperation<Iterable<KvO
 
     /** {@inheritDoc} */
     @Override
-    HttpContent encode() {
-        String uri = collection.concat("/").concat(key).concat("/relations");
-        for (final String kind : kinds) {
-            uri = uri.concat("/").concat(kind);
+    Iterable<KvObject<String>> fromResponse(
+            final int status, final HttpHeader httpHeader, final String json, final JacksonMapper mapper)
+            throws IOException {
+        assert (status == 200);
+
+        final ObjectMapper objectMapper = mapper.getMapper();
+        final JsonNode jsonNode = objectMapper.readTree(json);
+
+        final int count = jsonNode.get("count").asInt();
+        final List<KvObject<String>> relatedObjects = new ArrayList<KvObject<String>>(count);
+
+        final Iterator<JsonNode> iter = jsonNode.get("results").elements();
+        while (iter.hasNext()) {
+            final JsonNode result = iter.next();
+
+            // parse the PATH structure (e.g.):
+            // {"collection":"coll","key":"aKey","ref":"someRef"}
+            final JsonNode path = result.get("path");
+            final String collection = path.get("collection").asText();
+            final String key = path.get("key").asText();
+            final String ref = path.get("ref").asText();
+
+            final KvMetadata metadata = new KvMetadata(collection, key, ref);
+            final String rawValue = result.get("value").toString();
+
+            relatedObjects.add(new KvObject<String>(metadata, rawValue, rawValue));
         }
 
-        final HttpRequestPacket httpHeader = HttpRequestPacket.builder()
-                .method(Method.GET)
-                .uri(uri)
-                .build();
-        return httpHeader.httpContentBuilder()
-                .httpHeader(httpHeader)
-                .build();
+        return relatedObjects;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    Iterable<KvObject<String>> decode(
-            final HttpContent content, final HttpHeader header, final HttpStatus status) {
-        switch (status.getStatusCode()) {
-            case 200:
-                final JsonNode jsonNode;
-                try {
-                    jsonNode = Client.MAPPER.readTree(content.getContent().toStringContent());
-                } catch (final IOException e) {
-                    throw new ConversionException(e);
-                }
+    /**
+     * Returns the collection from this operation.
+     *
+     * @return The collection from this operation.
+     */
+    public String getCollection() {
+        return collection;
+    }
 
-                final int count = jsonNode.get("count").asInt();
-                final List<KvObject<String>> relatedObjects = new ArrayList<KvObject<String>>(count);
-                final Iterator<JsonNode> iter = jsonNode.get("results").elements();
-                while (iter.hasNext()) {
-                    final JsonNode result = iter.next();
+    /**
+     * Returns the key from this operation.
+     *
+     * @return The key from this operation.
+     */
+    public String getKey() {
+        return key;
+    }
 
-                    // parse the PATH structure (e.g.):
-                    // {"collection":"coll","key":"aKey","ref":"someRef"}
-                    final JsonNode path = result.get("path");
-                    final String collection = path.get("collection").asText();
-                    final String key = path.get("key").asText();
-                    final String ref = path.get("ref").asText();
-
-                    final KvMetadata metadata = new KvMetadata(collection, key, ref);
-                    final String rawValue = result.get("value").toString();
-
-                    relatedObjects.add(new KvObject<String>(metadata, rawValue, rawValue));
-                }
-
-                return relatedObjects;
-            default:
-                // FIXME do better with this error handling
-                throw new RuntimeException();
-        }
+    /**
+     * Returns the kinds from this operation.
+     *
+     * @return The kinds from this operation.
+     */
+    public List<String> getKinds() {
+        return Arrays.asList(kinds);
     }
 
 }

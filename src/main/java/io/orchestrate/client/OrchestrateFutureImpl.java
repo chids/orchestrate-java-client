@@ -26,16 +26,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
-// TODO document this
+/**
+ * A listenable future based on {@link java.util.concurrent.Future} for an
+ * operation.
+ *
+ * @param <T> The type of the future result.
+ */
 final class OrchestrateFutureImpl<T> implements OrchestrateFuture<T> {
 
-    // TODO document this
     private enum State {
-
-        // TODO document this
         CREATED, COMPLETE, CANCELLED;
 
-        // TODO document this
         static void check(final State current, final State... valid) {
             assert (valid != null);
 
@@ -49,6 +50,8 @@ final class OrchestrateFutureImpl<T> implements OrchestrateFuture<T> {
 
     }
 
+    /** The operation for this future. */
+    private final AbstractOperation<T> operation;
     /** The synchronization util to wait for the result of this future. */
     private final CountDownLatch latch;
     /** The exception thrown by this future. */
@@ -64,13 +67,14 @@ final class OrchestrateFutureImpl<T> implements OrchestrateFuture<T> {
     /** Tracks whether these listeners have already fired. */
     private volatile boolean listenersFired;
 
-    OrchestrateFutureImpl() {
+    OrchestrateFutureImpl(final AbstractOperation<T> operation) {
+        this.operation = operation;
         latch = new CountDownLatch(1);
         exception = null;
         result = null;
         state = State.CREATED;
         listenersLock = new ReentrantLock();
-        listeners = new HashSet<OrchestrateFutureListener<T>>();
+        listeners = new HashSet<OrchestrateFutureListener<T>>(operation.getListeners());
         listenersFired = false;
     }
 
@@ -111,7 +115,11 @@ final class OrchestrateFutureImpl<T> implements OrchestrateFuture<T> {
         }
 
         if (fireNow) {
-            listener.onComplete(this);
+            if (exception != null) {
+                listener.onException(this);
+            } else {
+                listener.onComplete(this);
+            }
         }
     }
 
@@ -170,6 +178,12 @@ final class OrchestrateFutureImpl<T> implements OrchestrateFuture<T> {
             throw new ExecutionException(exception);
         }
         return result;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public AbstractOperation<T> getOperation() {
+        return operation;
     }
 
     private void fireListeners() {
