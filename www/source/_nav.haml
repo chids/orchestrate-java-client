@@ -1,0 +1,54 @@
+%nav
+  %h1
+    = link_to 'orchestrate.io', 'index.html'
+  %h2
+    = link_to 'Introduction', 'index.html'
+  %ul
+    %li
+      = link_to 'About Orchestrate', 'index.html', :fragment => 'about'
+    %li
+      = link_to 'Getting Started', 'index.html', :fragment => 'getting-started'
+    %li
+      = link_to 'Managed Dependency', 'index.html', :fragment => 'managed-dependency'
+    %li
+      = link_to 'Download', 'index.html', :fragment => 'download'
+      %a{:href => "https://github.com/orchestrate-io/orchestrate-java-client"} (GitHub)
+    %li
+      = link_to 'Javadoc', 'index.html', :fragment => 'javadoc'
+      %a{:href => "/javadoc/latest/"} (latest)
+  %h2
+    = link_to 'Querying', 'querying.html'
+  %ul
+    %li
+      = link_to 'Key-Value', 'querying.html', :fragment => 'key-value'
+    %li
+      = link_to 'Search', 'querying.html', :fragment => 'search'
+    %li
+      = link_to 'Events', 'querying.html', :fragment => 'events'
+    %li
+      = link_to 'Graph', 'querying.html', :fragment => 'graph'
+  %h2
+    = link_to 'Examples', 'examples.html'
+  %ul
+    %li
+      = link_to 'DAO Pattern', 'examples.html', :fragment => 'data-access-object'
+    %li
+      = link_to 'Dropwizard (Managed)', 'examples.html', :fragment => 'dropwizard'
+    %li
+      = link_to 'Error Handling', 'examples.html', :fragment => 'error-handling'
+  %h2
+    = link_to 'Advanced Options', 'advanced-options.html'
+  %ul
+    %li
+      = link_to 'Tuning the Client', 'advanced-options.html', :fragment => 'tuning'
+    %li
+      = link_to 'Custom JSON Mapping', 'advanced-options.html', :fragment => 'json-mapping'
+  %h2
+    = link_to 'Feedback', 'feedback.html'
+  %ul
+    %li
+      = link_to 'Feature Proposals', 'feedback.html', :fragment => 'feature-proposals'
+    %li
+      = link_to 'Debugging Requests', 'feedback.html', :fragment => 'debugging-requests'
+    %li
+      = link_to 'Issues', 'feedback.html', :fragment => 'issues'
