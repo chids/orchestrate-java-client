@@ -96,8 +96,9 @@ The Javadocs for the codebase are available
 
 #### Note
 
-The client API is still in _flux_, we're looking for [feedback](/feedback.html)
- from developers and learning what you need to build incredible applications.
+The client API is still in _flux_, we're looking for
+ [feedback](http://orchestrate-io.github.io/orchestrate-java-client/feedback/)
+ from developers and designing what you need to build incredible applications.
 
 ### Developer notes
 
