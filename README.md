@@ -4,22 +4,16 @@ Orchestrate Java Client
 A high performance, asynchronous Java client to query the [Orchestrate.io](http://orchestrate.io/)
  service.
 
-The client API is still in __flux__, it is not yet stable. While we'll endeavour
- to keep API-breaking changes to a minimum, you should expect that _at the moment_
- there may be some migration work necessary with new releases.
-
 ### About
 
 The Orchestrate.io service is a platform for storing and querying data.
 
-Using Orchestrate.io you can focus on building applications and adding new
- features while we handle safely storing the data, providing a large variety of
- ways to query the data and keeping the service highly available to support your
+Using Orchestrate you can focus on building applications and adding new features
+ while we handle safely storing the data, providing a large variety of ways to
+ query the data and keeping the service highly available to support your
  applications as they grow.
 
-You can create an account by signing up at our [Dashboard](https://dashboard.orchestrate.io).
-
-[https://dashboard.orchestrate.io](https://dashboard.orchestrate.io)
+You can create an account by signing up at the [Dashboard](https://dashboard.orchestrate.io).
 
 ### Getting Started
 
@@ -29,7 +23,7 @@ The client library is available on [Maven Central](http://search.maven.org/#sear
 
 ```groovy
 dependencies {
-    compile group: 'io.orchestrate', name: 'orchestrate-java-client', version: '0.1.0'
+    compile group: 'io.orchestrate', name: 'orchestrate-client', version: '0.1.0'
 }
 ```
 
@@ -38,7 +32,7 @@ dependencies {
 ```xml
 <dependency>
     <groupId>io.orchestrate</groupId>
-    <artifactId>orchestrate-java-client</artifactId>
+    <artifactId>orchestrate-client</artifactId>
     <version>0.1.0</version>
 </dependency>
 ```
@@ -68,7 +62,7 @@ For example, to fetch an object from a `collection` with a given `key`.
 
 ```java
 KvFetchOperation<MyObj> kvFetchOp =
-    new KvFetchOperation<MyObj>("myCollection", "someKey", MyObj.class);
+    new KvFetchOperation<MyObj>("myCollection", "someKey");
 
 // execute the operation
 Future<KvObject<MyObj>> future = client.execute(kvFetchOp);
@@ -99,6 +93,11 @@ There's a [User Guide](http://orchestrate-io.github.io/orchestrate-java-client/)
 
 The Javadocs for the codebase are available
  [here](http://orchestrate-io.github.io/orchestrate-java-client/javadoc/latest).
+
+#### Note
+
+The client API is still in _flux_, we're looking for [feedback](/feedback.html)
+ from developers and learning what you need to build incredible applications.
 
 ### Developer notes
 
