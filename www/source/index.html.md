@@ -7,9 +7,22 @@ The client uses the [Grizzly framework](https://grizzly.java.net/) for
 
 ## <a name="about"></a> About Orchestrate
 
-[Orchestrate.io](http://orchestrate.io) eliminates the need for developers to manage multiple databases themselves when building applications, or adding features to existing applications. It unifies, stores and queries data including key/value, search, graph and events through a single, ambient layer between the application and the backend, which is accessed easily through a single, simple API.
+[Orchestrate.io](http://orchestrate.io) eliminates the need for
+  developers to manage multiple databases themselves when building
+  applications, or adding features to existing applications. It unifies, stores
+  and queries data including key/value, search, graph and events through a
+  single, ambient layer between the application and the backend, which is
+  accessed easily through a single, simple API.
 
-Orchestrate.io gives you full control and ownership of your data while safely storing it for you, provides a large variety of ways to query that data, and keeps the service highly available to support your application as it grows. It handles uptime across all of these systems, and ensures that your applications are still able to read and write data in the event of a “flash crowd” (a dramatically increase in traffic that requires the data system to scale rapidly to cope with the increase demand on resources). It improves fault tolerance, reduces complexity, improves security and puts data closer to global end users. 
+Orchestrate.io gives you full control and ownership of your data while
+  safely storing it for you, provides a large variety of ways to query that
+  data, and keeps the service highly available to support your application as
+  it grows. It handles uptime across all of these systems, and ensures that
+  your applications are still able to read and write data in the event of a
+  “flash crowd” (a dramatically increase in traffic that requires the data
+  system to scale rapidly to cope with the increase demand on resources). It
+  improves fault tolerance, reduces complexity, improves security and puts data
+  closer to global end users. 
 
 ### Creating an account
 
