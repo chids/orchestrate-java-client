@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Orchestrate Java Client</title>
+    <meta charset='utf-8'>
+    <meta content='A high performance, asynchronous Java client to query the Orchestrate.io service.' name='description'>
+    <meta content='on' http-equiv='cleartype'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <link href="/orchestrate-java-client/stylesheets/style.css" media="screen" rel="stylesheet" type="text/css" />
+    <script>
+      window.analytics||(window.analytics=[]),window.analytics.methods=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group","on","once","off"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var method=window.analytics.methods[i];window.analytics[method]=window.analytics.factory(method)}window.analytics.load=function(t){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)},window.analytics.SNIPPET_VERSION="2.0.8",
+      window.analytics.load("nkkww5j074");
+      window.analytics.page('Java Docs');
+    </script>
+  </head>
+  <body>
+    <nav>
+      <h1>
+        <a href="/orchestrate-java-client/">orchestrate.io</a>
+      </h1>
+      <h2>
+        <a href="/orchestrate-java-client/">Introduction</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/#about">About Orchestrate</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#getting-started">Getting Started</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#managed-dependency">Managed Dependency</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#download">Download</a>
+          <a href='https://github.com/orchestrate-io/orchestrate-java-client'>(GitHub)</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#javadoc">Javadoc</a>
+          <a href='/javadoc/latest/'>(latest)</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/querying/">Querying</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/querying/#key-value">Key-Value</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/querying/#search">Search</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/querying/#events">Events</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/querying/#graph">Graph</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/examples/">Examples</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/examples/#data-access-object">DAO Pattern</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/examples/#dropwizard">Dropwizard (Managed)</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/examples/#error-handling">Error Handling</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/advanced-options/">Advanced Options</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/advanced-options/#tuning">Tuning the Client</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/advanced-options/#json-mapping">Custom JSON Mapping</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/feedback/">Feedback</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/feedback/#feature-proposals">Feature Proposals</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/feedback/#debugging-requests">Debugging Requests</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/feedback/#issues">Issues</a>
+        </li>
+      </ul>
+    </nav>
+    <div class='content'>
+      <h1>Orchestrate Java Client</h1>
+      <p>The client API is designed around the concept of operations you can execute on
+       the Orchestrate.io service. The client library is entirely <em>asynchronous</em> and
+       conforms to the <a href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Future.html"><code>java.util.concurrent.Future</code></a>
+       specification in the standard library.</p>
+      
+      <p>Under the hood the client makes <code>HTTP</code> requests to the <a href="http://docs.orchestrate.io/">REST API</a>.
+       All data is written to the platform as <a href="http://json.org/"><code>JSON</code></a> and the client
+       will handle marshalling and unmarshalling the data into Java objects.</p>
+      
+      <p>Every Key/Value object has a unique identifier that represents the current
+       version of the object, this information is known as the “ref”. The ref is a
+       content-based hash that identifies the specific version of a value. With it
+       you can track the history of an object and retrieve old versions.</p>
+      
+      <h3><a name="constructing-a-client"></a> Constructing a Client</h3>
+      
+      <p>A <code>Client</code> object is the starting point for making requests to the
+       Orchestrate.io service, it manages the connection pool and makes <code>HTTP</code>
+       requests to the <a href="http://docs.orchestrate.io/">REST API</a>.</p>
+      
+      <p>You construct a client using the <code>API key</code> for your <code>Application</code> which can be
+       found in the <a href="https://dashboard.orchestrate.io/">Dashboard</a> (for help, see
+       <a href="/#getting-started">here</a>).</p>
+      <pre class="highlight java"><span class="c1">// An API key looks something like:</span>&#x000A;<span class="c1">//   3854bbd7-0a31-43b0-aa94-66236847a717</span>&#x000A;<span class="n">Client</span> <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Client</span><span class="o">(</span><span class="s">&quot;your api key&quot;</span><span class="o">);</span></pre>
+      <p>A <code>Client</code> can be shared across threads and you only need to construct one per
+       Java application. For more advanced configuration options, check out
+       <a href="/orchestrate-java-client/advanced-options/#tuning">Tuning the Client</a>.</p>
+      
+      <h3>Stopping a Client</h3>
+      
+      <p>Sometimes it&rsquo;s necessary to release the resources used by a <code>Client</code> and
+       reconstruct it again at some later stage.</p>
+      <pre class="highlight java"><span class="n">client</span><span class="o">.</span><span class="na">stop</span><span class="o">();</span>&#x000A;&#x000A;<span class="c1">// some method later, using #execute(...) will reallocate resources</span>&#x000A;<span class="n">client</span><span class="o">.</span><span class="na">execute</span><span class="o">(...);</span></pre>
+      <h2><a name="key-value"></a> Key-Value</h2>
+      
+      <p>Key-Value operations are the heart of the Orchestrate.io service. These are the
+       most common operations you&rsquo;ll perform and is the primary way of storing data.</p>
+      
+      <p>All Key-Value operations happen in the context of a <code>Collection</code>. If the
+       collection does not exist it will be <em>implicitly</em> created when data is first
+       written.</p>
+      
+      <p>As mentioned above, all client operations are <em>asynchronous</em>.</p>
+      
+      <h3> <a name="fetch-data"></a> Fetch Data</h3>
+      
+      <p>To fetch an object from a <code>collection</code> with a given <code>key</code>.</p>
+      <pre class="highlight java"><span class="n">KvFetchOperation</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;</span> <span class="n">kvFetchOp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">KvFetchOperation</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;(</span>&#x000A;        <span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">,</span> <span class="n">MyObject</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// execute the operation</span>&#x000A;<span class="n">Future</span><span class="o">&lt;</span><span class="n">KvObject</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;&gt;</span> <span class="n">kvObjectFuture</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">kvFetchOp</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// wait for the result</span>&#x000A;<span class="n">KvObject</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;</span> <span class="n">kvObject</span> <span class="o">=</span> <span class="n">kvObjectFuture</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// check the data exists</span>&#x000A;<span class="k">if</span> <span class="o">(</span><span class="n">result</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>&#x000A;    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;'someKey' does not exist.&quot;</span><span class="o">;</span>&#x000A;<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>&#x000A;    <span class="n">MyObj</span> <span class="n">data</span> <span class="o">=</span> <span class="n">kvObject</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>&#x000A;    <span class="c1">// do something with the 'data'</span>&#x000A;<span class="o">}</span></pre>
+      <p>This example shows how to retrieve the value for a key from a collection and
+       deserialize the result JSON to a <a href="http://en.wikipedia.org/wiki/Plain_Old_Java_Object">POJO</a>
+       called <code>MyObj</code>.</p>
+      
+      <h3><a name="store-data"></a> Store Data</h3>
+      
+      <p>To store an object from a <code>collection</code> to a given <code>key</code>.</p>
+      <pre class="highlight java"><span class="c1">// create some data to store</span>&#x000A;<span class="n">MyObj</span> <span class="n">myObj</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyObj</span><span class="o">(...);</span>&#x000A;&#x000A;<span class="n">KvStoreOperation</span> <span class="n">kvStoreOp</span> <span class="o">=</span>&#x000A;    <span class="k">new</span> <span class="n">KvStoreOperation</span><span class="o">(</span><span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">,</span> <span class="n">myObj</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// execute the operation</span>&#x000A;<span class="n">Future</span><span class="o">&lt;</span><span class="n">KvMetadata</span><span class="o">&gt;</span> <span class="n">kvOpFuture</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">kvStoreOp</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// wait for the result</span>&#x000A;<span class="n">KvMetadata</span> <span class="n">kvMetadata</span> <span class="o">=</span> <span class="n">kvOpFuture</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// print the 'ref' for the stored data</span>&#x000A;<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">kvMetadata</span><span class="o">.</span><span class="na">getRef</span><span class="o">());</span></pre>
+      <p>This example shows how to store a value for a key to a collection, <code>myObj</code> is
+       serialized to JSON by the client before writing the data.</p>
+      
+      <p>The <code>KvMetadata</code> returned by the store operation contains information about
+       where the information has been stored and the version (<code>ref</code>) it&rsquo;s been written
+       with.</p>
+      
+      <h4><a name="conditional-store"></a> Conditional Store</h4>
+      
+      <p>The <code>ref</code> metadata returned from a store operation is important, it allows
+       you to perform a &ldquo;Conditional PUT&rdquo;.</p>
+      <pre class="highlight java"><span class="c1">// update 'myObj' if the 'currentRef' matches the ref on the server</span>&#x000A;<span class="n">String</span> <span class="n">currentRef</span> <span class="o">=</span> <span class="n">kvMetadata</span><span class="o">.</span><span class="na">getRef</span><span class="o">();</span>&#x000A;<span class="n">KvStoreOperation</span> <span class="n">kvStoreOp</span> <span class="o">=</span>&#x000A;    <span class="k">new</span> <span class="n">KvStoreOperation</span><span class="o">(</span><span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">,</span> <span class="n">myObj</span><span class="o">,</span> <span class="n">currentRef</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// store the new 'myObj' data if 'someKey' does not already exist</span>&#x000A;<span class="kt">boolean</span> <span class="n">ifAbsent</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>&#x000A;<span class="n">KvStoreOperation</span> <span class="n">kvStoreOp</span> <span class="o">=</span>&#x000A;    <span class="k">new</span> <span class="n">KvStoreOperation</span><span class="o">(</span><span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">,</span> <span class="n">myObj</span><span class="o">,</span> <span class="n">ifAbsent</span><span class="o">);</span></pre>
+      <p>This type of store operation is very useful in high write concurrency
+       environments, it provides a pre-condition that must be <code>true</code> for the store
+       operation to succeed.</p>
+      
+      <h3><a name="delete-data"></a> Delete Data</h3>
+      
+      <p>To delete an object by <code>key</code> or the <code>collection</code> of objects.</p>
+      <pre class="highlight java"><span class="n">DeleteOperation</span> <span class="n">deleteOp</span> <span class="o">=</span>&#x000A;        <span class="k">new</span> <span class="n">DeleteOperation</span><span class="o">(</span><span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// execute the operation</span>&#x000A;<span class="n">Future</span><span class="o">&lt;</span><span class="n">Boolean</span><span class="o">&gt;</span> <span class="n">deleteFuture</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">deleteOp</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// wait for the result</span>&#x000A;<span class="n">Boolean</span> <span class="n">deleted</span> <span class="o">=</span> <span class="n">deleteFuture</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>&#x000A;&#x000A;<span class="k">if</span> <span class="o">(</span><span class="n">deleted</span><span class="o">)</span> <span class="o">{</span>&#x000A;    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Successfully deleted a key.&quot;</span><span class="o">);</span>&#x000A;<span class="o">}</span></pre><pre class="highlight java"><span class="c1">// delete an entire collection, by careful, this cannot be undone</span>&#x000A;<span class="n">DeleteOperation</span> <span class="n">deleteOp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DeleteOperation</span><span class="o">(</span><span class="s">&quot;myCollection&quot;</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// same as above</span></pre>
+      <h4><a name="conditional-delete"></a> Conditional Delete</h4>
+      
+      <p>Similar to a <a href="#conditional-store">conditional store</a> operation, a conditional
+       delete provides a pre-condition that must be <code>true</code> for the operation to
+       succeed.</p>
+      <pre class="highlight java"><span class="n">String</span> <span class="n">currentRef</span> <span class="o">=</span> <span class="n">kvMetadata</span><span class="o">.</span><span class="na">getRef</span><span class="o">();</span>&#x000A;<span class="n">DeleteOperation</span> <span class="n">deleteOp</span> <span class="o">=</span>&#x000A;    <span class="k">new</span> <span class="n">DeleteOperation</span><span class="o">(</span><span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">,</span> <span class="n">currentRef</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// same as above</span></pre>
+      <p>The object with the key <code>someKey</code> will be deleted if and only if the
+       <code>currentRef</code> matches the current ref for the object on the server.</p>
+      
+      <h2><a name="search"></a> Search</h2>
+      
+      <p>A powerful feature of the Orchestrate.io service is the search functionality;
+       when an object is written to the platform the data will be semantically indexed
+       in the background.</p>
+      
+      <p>This allows you to perform search queries on the data without any extra
+       configuration hassle and no need to run a separate search cluster of some kind
+       to ask questions about the data stored.</p>
+      
+      <p>The query language used to perform searches is the familiar
+       <a href="http://lucene.apache.org/core/4_3_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Overview">Lucene Syntax</a>,
+       any Lucene query is a valid Orchestrate.io search query.</p>
+      
+      <p>The simplest search query is a <code>*</code> query.</p>
+      <pre class="highlight java"><span class="c1">// if you don't provide a query, it defaults to '*'</span>&#x000A;<span class="n">SearchOperation</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;</span> <span class="n">searchOp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SearchOperation</span><span class="o">(</span>&#x000A;        <span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="n">MyObj</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// execute the operation</span>&#x000A;<span class="n">Future</span><span class="o">&lt;</span><span class="n">SearchResults</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;&gt;</span> <span class="n">searchFuture</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">searchOp</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// wait for the result</span>&#x000A;<span class="n">SearchResults</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;</span> <span class="n">searchResults</span> <span class="o">=</span> <span class="n">searchFuture</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>&#x000A;&#x000A;<span class="k">for</span> <span class="o">(</span><span class="n">Result</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">:</span> <span class="n">searchResults</span><span class="o">)</span> <span class="o">{</span>&#x000A;    <span class="c1">// do something with the search results</span>&#x000A;    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getScore</span><span class="o">());</span>&#x000A;<span class="o">}</span></pre>
+      <p>A more complex search query could look like this:</p>
+      <pre class="highlight java"><span class="n">SearchOperation</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;</span> <span class="n">searchOp</span> <span class="o">=</span> <span class="n">SearchOperation</span>&#x000A;    <span class="o">.</span><span class="na">builder</span><span class="o">(</span><span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="n">MyObj</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>&#x000A;    <span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="s">&quot;*&quot;</span><span class="o">)</span>&#x000A;    <span class="o">.</span><span class="na">limit</span><span class="o">(</span><span class="mi">50</span><span class="o">)</span>&#x000A;    <span class="o">.</span><span class="na">offset</span><span class="o">(</span><span class="mi">10</span><span class="o">)</span>&#x000A;    <span class="o">.</span><span class="na">build</span><span class="o">();</span>&#x000A;&#x000A;<span class="c1">// same as above</span></pre>
+      <p>The collection called <code>myCollection</code> will be searched with the query <code>*</code> and
+       up to <code>50</code> results may be returned with a starting offset of <code>10</code> from the most
+       relevant. The results will be deserialized to <code>MyObj</code>s.</p>
+      
+      <h3>Note</h3>
+      
+      <p>Search results are currently limited to no more than <strong>100</strong> results for each
+       query, if this limit is not suitable for you please let us know.</p>
+      
+      <p>By default, a search operation will only return up to <strong>10</strong> results, use the
+       <code>SearchOperation.Builder</code> as shown above to retrieve more results for a query.</p>
+      
+      <h3>Some Example Queries</h3>
+      
+      <p>Here are some query examples demonstrating the Lucene query syntax.</p>
+      <pre class="highlight java"><span class="c1">// keyword matching</span>&#x000A;<span class="n">SearchOperation</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;</span> <span class="n">searchOp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SearchOperation</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;(</span>&#x000A;    <span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="n">MyObj</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;title:\&quot;foo bar\&quot;&quot;</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// proximity matching</span>&#x000A;<span class="n">SearchOperation</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;</span> <span class="n">searchOp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SearchOperation</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;(</span>&#x000A;    <span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="n">MyObj</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;\&quot;foo bar\&quot;~4&quot;</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// range searches</span>&#x000A;<span class="n">SearchOperation</span><span class="o">&lt;</span><span class="n">MyObj</span><span class="o">&gt;</span> <span class="n">searchOp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SearchOperation</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;(</span>&#x000A;    <span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="n">MyObj</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;year_of_birth:[20020101 TO 20030101]&quot;</span><span class="o">);</span></pre>
+      <p>Ignore the backslashes in the first two examples, this is necessary to escape
+       the quotes in the Java string literal.</p>
+      
+      <h2><a name="events"></a> Events</h2>
+      
+      <p>In the Orchestrate.io service, an event is a time ordered piece of data you want
+       to store in the context of a key. This specialist storage type exists because
+       we believe it&rsquo;s pretty common in the design of most applications.</p>
+      
+      <p>Some examples of types of objects you&rsquo;d want to store as events are; comments
+       that belong to a blog article, items in a user&rsquo;s news feed from a social
+       network, or billing history from a customer.</p>
+      
+      <h3><a name="fetch-events"></a> Fetch Events</h3>
+      
+      <p>To fetch events belonging to a <code>key</code> in a specific <code>collection</code> of a specific
+       <code>type</code>, where type could be a name like &ldquo;comments&rdquo; or &ldquo;feed&rdquo;.</p>
+      <pre class="highlight java"><span class="n">EventFetchOperation</span><span class="o">&lt;</span><span class="n">MyObject</span><span class="o">&gt;</span> <span class="n">eventFetchOp</span> <span class="o">=</span>&#x000A;        <span class="k">new</span> <span class="n">EventFetchOperation</span><span class="o">&lt;</span><span class="n">MyObject</span><span class="o">&gt;(</span>&#x000A;        <span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">,</span> <span class="s">&quot;type&quot;</span><span class="o">,</span> <span class="n">MyObject</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// execute the operation</span>&#x000A;<span class="n">Future</span><span class="o">&lt;</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Event</span><span class="o">&lt;</span><span class="n">MyObject</span><span class="o">&gt;&gt;&gt;</span> <span class="n">eventFuture</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">eventFetchOp</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// wait for the result</span>&#x000A;<span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Event</span><span class="o">&lt;</span><span class="n">MyObject</span><span class="o">&gt;&gt;</span> <span class="n">events</span> <span class="o">=</span> <span class="n">eventFuture</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// iterate on the events, they will be ordered by the most recent value</span>&#x000A;<span class="k">for</span> <span class="o">(</span><span class="n">Event</span><span class="o">&lt;</span><span class="n">MyObject</span><span class="o">&gt;</span> <span class="n">event</span> <span class="o">:</span> <span class="n">events</span><span class="o">)</span> <span class="o">{</span>&#x000A;    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">getTimestamp</span><span class="o">());</span>&#x000A;<span class="o">}</span></pre>
+      <p>You can also supply an optional <code>start</code> and <code>end</code> timestamp to retrieve a subset
+       of the events.</p>
+      <pre class="highlight java"><span class="n">EventFetchOperation</span><span class="o">&lt;</span><span class="n">MyObject</span><span class="o">&gt;</span> <span class="n">eventFetchOp</span> <span class="o">=</span>&#x000A;    <span class="k">new</span> <span class="n">EventFetchOperation</span><span class="o">&lt;</span><span class="n">MyObject</span><span class="o">&gt;(</span>&#x000A; <span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">,</span> <span class="s">&quot;eventType&quot;</span><span class="o">,</span> <span class="mi">0L</span><span class="o">,</span> <span class="mi">13865200L</span><span class="o">,</span> <span class="n">MyObject</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// same as above</span></pre>
+      <h3><a name="store-event"></a> Store Event</h3>
+      
+      <p>You can think of storing an event like adding to the front of a time-ordered
+       immutable list of objects.</p>
+      
+      <p>To store an event to a <code>key</code> in a <code>collection</code> with a specific <code>type</code>.</p>
+      <pre class="highlight java"><span class="n">MyObject</span> <span class="n">myObj</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyObject</span><span class="o">(..);</span>&#x000A;&#x000A;<span class="n">EventStoreOperation</span> <span class="n">eventStoreOp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">EventStoreOperation</span><span class="o">(</span>&#x000A;        <span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">,</span> <span class="s">&quot;eventType&quot;</span><span class="o">,</span> <span class="n">myObj</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// execute the operation</span>&#x000A;<span class="n">Future</span><span class="o">&lt;</span><span class="n">Boolean</span><span class="o">&gt;</span> <span class="n">eventStoreFuture</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">eventStoreOp</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// wait for the result</span>&#x000A;<span class="n">Boolean</span> <span class="n">stored</span> <span class="o">=</span> <span class="n">eventStoreFuture</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>&#x000A;&#x000A;<span class="k">if</span> <span class="o">(</span><span class="n">stored</span><span class="o">)</span> <span class="o">{</span>&#x000A;    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Successfully stored an event.&quot;</span><span class="o">);</span>&#x000A;<span class="o">}</span></pre>
+      <p>You can also supply an optional <code>timestamp</code> for the event, this will be used
+       instead of the timestamp of the write operation.</p>
+      <pre class="highlight java"><span class="n">EventStoreOperation</span> <span class="n">eventStoreOp</span> <span class="o">=</span>&#x000A;    <span class="k">new</span> <span class="n">EventStoreOperation</span><span class="o">(</span>&#x000A;    <span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">,</span> <span class="s">&quot;eventType&quot;</span><span class="o">,</span> <span class="n">myObj</span><span class="o">,</span> <span class="mi">13865200L</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// same as above</span></pre>
+      <h2><a name="graph"></a> Graph</h2>
+      
+      <p>While building an application it&rsquo;s possible that you&rsquo;ll want to make associations
+       between particular objects of the same type or even objects of completely
+       different types that share a property of some kind.</p>
+      
+      <p>It&rsquo;s this sort of data problem that makes the graph features in Orchestrate.io
+       shine, if you&rsquo;re building a socially-aware application you might want to
+       add relations between data like &ldquo;friend&rdquo; or &ldquo;follows&rdquo;.</p>
+      
+      <p>A graph query is the right choice when you have a starting object that you want
+       search from to follow relevant relationships and accumulate interesting
+       information.</p>
+      
+      <h3><a name="fetch-relations"></a> Fetch Relations</h3>
+      
+      <p>To fetch objects related to the <code>key</code> in the <code>collection</code> based on a
+       relationship or number of <code>relation</code>s.</p>
+      <pre class="highlight java"><span class="n">RelationFetchOperation</span> <span class="n">relationFetchOp</span> <span class="o">=</span>&#x000A;    <span class="k">new</span> <span class="n">RelationFetchOperation</span><span class="o">(</span><span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">,</span> <span class="s">&quot;relation&quot;</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// execute the operation</span>&#x000A;<span class="n">Future</span><span class="o">&lt;</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">KvObject</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;&gt;</span> <span class="n">future</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">relationFetchOp</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// wait for the result</span>&#x000A;<span class="n">Iterable</span><span class="o">&lt;</span><span class="n">KvObject</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">results</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>&#x000A;&#x000A;<span class="k">for</span> <span class="o">(</span><span class="n">KvObject</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">:</span> <span class="n">results</span><span class="o">)</span> <span class="o">{</span>&#x000A;    <span class="c1">// the raw JSON string</span>&#x000A;    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getValue</span><span class="o">());</span>&#x000A;<span class="o">}</span></pre>
+      <p>Imagine that we&rsquo;d like to know the <code>follow</code>ers of <code>users</code> that are <code>friend</code>s of
+       the user <code>tony</code>. This kind of query could look like this.</p>
+      <pre class="highlight java"><span class="n">RelationFetchOperation</span> <span class="n">relationFetchOp</span> <span class="o">=</span>&#x000A;    <span class="k">new</span> <span class="n">RelationFetchOperation</span><span class="o">(</span><span class="s">&quot;users&quot;</span><span class="o">,</span> <span class="s">&quot;tony&quot;</span><span class="o">,</span> <span class="s">&quot;friend&quot;</span><span class="o">,</span> <span class="s">&quot;follow&quot;</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// same as above</span></pre>
+      <h4>Note</h4>
+      
+      <p>At the moment, you will always get the raw JSON string back from a relation
+       query because relations can span collections, it&rsquo;s not possible to map the
+       objects back to their Java types automatically.</p>
+      
+      <p>We may lift this restriction in a future release of the client.</p>
+      
+      <h3><a name="store-relation"></a> Store Relation</h3>
+      
+      <p>To store a <code>relation</code> between one <code>key</code> to another <code>key</code> within the same
+       <code>collection</code> or across different <code>collection</code>s.</p>
+      <pre class="highlight java"><span class="n">RelationStoreOperation</span> <span class="n">relationStoreOp</span> <span class="o">=</span>&#x000A;    <span class="k">new</span> <span class="n">RelationStoreOperation</span><span class="o">(</span>&#x000A;    <span class="s">&quot;myCollection&quot;</span><span class="o">,</span> <span class="s">&quot;someKey&quot;</span><span class="o">,</span> <span class="s">&quot;relation&quot;</span><span class="o">,</span> <span class="s">&quot;toCollection&quot;</span><span class="o">,</span> <span class="s">&quot;toSomeKey&quot;</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// execute the operation</span>&#x000A;<span class="n">Future</span><span class="o">&lt;</span><span class="n">Boolean</span><span class="o">&gt;</span> <span class="n">relationStoreFuture</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">relationStoreOp</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// wait for the result</span>&#x000A;<span class="n">Boolean</span> <span class="n">stored</span> <span class="o">=</span> <span class="n">relationStoreFuture</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>&#x000A;&#x000A;<span class="k">if</span> <span class="o">(</span><span class="n">stored</span><span class="o">)</span> <span class="o">{</span>&#x000A;    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Successfully stored the relation.&quot;</span><span class="o">);</span>&#x000A;<span class="o">}</span></pre>
+      <footer>Orchestrate.io &copy; 2013</footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Orchestrate Java Client</title>
+    <meta charset='utf-8'>
+    <meta content='A high performance, asynchronous Java client to query the Orchestrate.io service.' name='description'>
+    <meta content='on' http-equiv='cleartype'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <link href="/orchestrate-java-client/stylesheets/style.css" media="screen" rel="stylesheet" type="text/css" />
+    <script>
+      window.analytics||(window.analytics=[]),window.analytics.methods=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group","on","once","off"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var method=window.analytics.methods[i];window.analytics[method]=window.analytics.factory(method)}window.analytics.load=function(t){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)},window.analytics.SNIPPET_VERSION="2.0.8",
+      window.analytics.load("nkkww5j074");
+      window.analytics.page('Java Docs');
+    </script>
+  </head>
+  <body>
+    <nav>
+      <h1>
+        <a href="/orchestrate-java-client/">orchestrate.io</a>
+      </h1>
+      <h2>
+        <a href="/orchestrate-java-client/">Introduction</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/#about">About Orchestrate</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#getting-started">Getting Started</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#managed-dependency">Managed Dependency</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#download">Download</a>
+          <a href='https://github.com/orchestrate-io/orchestrate-java-client'>(GitHub)</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#javadoc">Javadoc</a>
+          <a href='/javadoc/latest/'>(latest)</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/querying/">Querying</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/querying/#key-value">Key-Value</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/querying/#search">Search</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/querying/#events">Events</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/querying/#graph">Graph</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/examples/">Examples</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/examples/#data-access-object">DAO Pattern</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/examples/#dropwizard">Dropwizard (Managed)</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/examples/#error-handling">Error Handling</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/advanced-options/">Advanced Options</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/advanced-options/#tuning">Tuning the Client</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/advanced-options/#json-mapping">Custom JSON Mapping</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/feedback/">Feedback</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/feedback/#feature-proposals">Feature Proposals</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/feedback/#debugging-requests">Debugging Requests</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/feedback/#issues">Issues</a>
+        </li>
+      </ul>
+    </nav>
+    <div class='content'>
+      <h1>Orchestrate Java Client</h1>
+      <p>While we try to ensure the Java client has useful default configuration settings
+       it may be necessary to tweak the behaviour of the library for the requirements
+       of your server environment.</p>
+      
+      <p>The information below demonstrates how to make advanced changes to the client.</p>
+      
+      <h2><a name="tuning"></a> Tuning the Client</h2>
+      
+      <p>As well as the <a href="querying#constructing-a-client">basic constructor</a> for the
+       <code>Client</code> it&rsquo;s possible to create a client object using the <code>Builder</code>
+       interface.</p>
+      
+      <p>The builder allows you to configure settings like the initial size of the
+       connection pool, the maximum number of connections that can be allocated, and
+       other tuning parameters.</p>
+      <pre class="highlight java"><span class="n">Client</span> <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="o">.</span><span class="na">builder</span><span class="o">(</span><span class="s">&quot;your api key&quot;</span><span class="o">)</span>&#x000A;    <span class="o">.</span><span class="na">poolSize</span><span class="o">(</span><span class="mi">50</span><span class="o">)</span>&#x000A;    <span class="o">.</span><span class="na">maxPoolSize</span><span class="o">(</span><span class="mi">100</span><span class="o">)</span>&#x000A;    <span class="o">.</span><span class="na">build</span><span class="o">();</span></pre>
+      <p>You can read more about the <code>Client.Builder</code> in the <a href="/javadoc/latest/io/orchestrate/client/Client.Builder.html">javadocs</a>.</p>
+      
+      <h2><a name="json-mapping"></a> Custom JSON Mapping</h2>
+      
+      <p>The Java client uses the excellent <a href="http://wiki.fasterxml.com/JacksonHome">Jackson JSON library</a>
+       to handle serializing your data to JSON before it&rsquo;s written to the
+       Orchestrate.io service. Jackson has a very large array of configuration settings
+       that allow you to tweak the way data is serialized and deserialized.</p>
+      
+      <p>The client exposes the ability to set Jackson&rsquo;s <code>ObjectMapper</code> from your code.</p>
+      <pre class="highlight java"><span class="c1">// force escaping of non-ASCII characters</span>&#x000A;<span class="c1">// avoid exception when encountering unknown property</span>&#x000A;<span class="n">ObjectMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ObjectMapper</span><span class="o">();</span>&#x000A;<span class="n">mapper</span><span class="o">.</span><span class="na">enable</span><span class="o">(</span><span class="n">JsonGenerator</span><span class="o">.</span><span class="na">Feature</span><span class="o">.</span><span class="na">ESCAPE_NON_ASCII</span><span class="o">);</span>&#x000A;<span class="n">mapper</span><span class="o">.</span><span class="na">disable</span><span class="o">(</span><span class="n">DeserializationFeature</span><span class="o">.</span><span class="na">FAIL_ON_UNKNOWN_PROPERTIES</span><span class="o">);</span>&#x000A;&#x000A;<span class="n">Client</span> <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Client</span><span class="o">(</span><span class="s">&quot;your api key&quot;</span><span class="o">,</span> <span class="n">mapper</span><span class="o">);</span>&#x000A;&#x000A;<span class="c1">// OR with greater configuration control</span>&#x000A;<span class="n">Client</span> <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="o">.</span><span class="na">builder</span><span class="o">(</span><span class="s">&quot;your api key&quot;</span><span class="o">)</span>&#x000A;    <span class="o">.</span><span class="na">mapper</span><span class="o">(</span><span class="n">JacksonMapper</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>&#x000A;        <span class="o">.</span><span class="na">registerModule</span><span class="o">(</span><span class="k">new</span> <span class="n">JodaModule</span><span class="o">())</span>&#x000A;        <span class="o">.</span><span class="na">enable</span><span class="o">(</span><span class="n">JsonGenerator</span><span class="o">.</span><span class="na">Feature</span><span class="o">.</span><span class="na">ESCAPE_NON_ASCII</span><span class="o">)</span>&#x000A;        <span class="o">.</span><span class="na">disable</span><span class="o">(</span><span class="n">DeserializationFeature</span><span class="o">.</span><span class="na">FAIL_ON_UNKNOWN_PROPERTIES</span><span class="o">))</span>&#x000A;    <span class="o">.</span><span class="na">build</span><span class="o">();</span></pre>
+      <p>You can read more about the <code>JacksonMapper.Builder</code> in the
+       <a href="/javadoc/latest/io/orchestrate/client/JacksonMapper.Builder.html">javadocs</a>.</p>
+      
+      <h3>Note</h3>
+      
+      <p>At the moment there&rsquo;s no way to supply your own JSON mapping library to use when
+       converting data to and from your application&rsquo;s object types. For example, you
+       cannot choose to use <a href="https://code.google.com/p/google-gson/">Google&rsquo;s Gson library</a>
+       instead of Jackson.</p>
+      
+      <p>We may lift this restriction in a future release of the client.</p>
+      <footer>Orchestrate.io &copy; 2013</footer>
+    </div>
+  </body>
+</html>

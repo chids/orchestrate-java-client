@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Orchestrate Java Client</title>
+    <meta charset='utf-8'>
+    <meta content='A high performance, asynchronous Java client to query the Orchestrate.io service.' name='description'>
+    <meta content='on' http-equiv='cleartype'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <link href="/orchestrate-java-client/stylesheets/style.css" media="screen" rel="stylesheet" type="text/css" />
+    <script>
+      window.analytics||(window.analytics=[]),window.analytics.methods=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group","on","once","off"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var method=window.analytics.methods[i];window.analytics[method]=window.analytics.factory(method)}window.analytics.load=function(t){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)},window.analytics.SNIPPET_VERSION="2.0.8",
+      window.analytics.load("nkkww5j074");
+      window.analytics.page('Java Docs');
+    </script>
+  </head>
+  <body>
+    <nav>
+      <h1>
+        <a href="/orchestrate-java-client/">orchestrate.io</a>
+      </h1>
+      <h2>
+        <a href="/orchestrate-java-client/">Introduction</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/#about">About Orchestrate</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#getting-started">Getting Started</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#managed-dependency">Managed Dependency</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#download">Download</a>
+          <a href='https://github.com/orchestrate-io/orchestrate-java-client'>(GitHub)</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/#javadoc">Javadoc</a>
+          <a href='/javadoc/latest/'>(latest)</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/querying/">Querying</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/querying/#key-value">Key-Value</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/querying/#search">Search</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/querying/#events">Events</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/querying/#graph">Graph</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/examples/">Examples</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/examples/#data-access-object">DAO Pattern</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/examples/#dropwizard">Dropwizard (Managed)</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/examples/#error-handling">Error Handling</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/advanced-options/">Advanced Options</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/advanced-options/#tuning">Tuning the Client</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/advanced-options/#json-mapping">Custom JSON Mapping</a>
+        </li>
+      </ul>
+      <h2>
+        <a href="/orchestrate-java-client/feedback/">Feedback</a>
+      </h2>
+      <ul>
+        <li>
+          <a href="/orchestrate-java-client/feedback/#feature-proposals">Feature Proposals</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/feedback/#debugging-requests">Debugging Requests</a>
+        </li>
+        <li>
+          <a href="/orchestrate-java-client/feedback/#issues">Issues</a>
+        </li>
+      </ul>
+    </nav>
+    <div class='content'>
+      <h1>Orchestrate Java Client</h1>
+      <blockquote>
+      <p>Feedback is the breakfast of champions. <cite>Ken Blanchard</cite></p>
+      </blockquote>
+      
+      <h2><a name="feature-proposals"></a> Feature Proposals</h2>
+      
+      <p>We&rsquo;re constantly improving the Orchestrate.io service.</p>
+      
+      <p>Adding new features, optimising the performance of the platform and refining our
+       efforts on the goal of providing developers all the query functionality you
+       need to build large scale applications like Foursquare, Twitter and Facebook
+       with Orchestrate.io.</p>
+      
+      <p>We welcome all feedback you have about the service, no matter how small. We&rsquo;re
+       especially interested in limitations you encounter that delay or prevent you
+       from develop your applications on the platform.</p>
+      
+      <p>You can reach us within the <a href="https://dashboard.orchestrate.io/">Dashboard</a> by
+       clicking the support button on the right side menu (the icon that looks like a
+       message bubble) and sending a message.</p>
+      
+      <p>You can also request new features or vote for an existing one via our UserVoice:</p>
+      
+      <p><a href="http://support.orchestrate.io/">http://support.orchestrate.io/</a></p>
+      
+      <h2><a name="debugging-requests"></a> Debugging Requests</h2>
+      
+      <p>When you <code>execute</code> a client operation, the library makes a HTTP request to the
+       Orchestrate platform. The service responds to the request with a response
+       containing an <code>X-Orchestrate-Req-Id</code> header. This helps us locate the HTTP
+       request information internally when debugging a problem.</p>
+      
+      <p>You can see this response information by enabling <code>INFO</code> level logging in the
+       client and configuring an <a href="http://www.slf4j.org/">SLF4J</a> logger. Some exception
+       messages thrown by the client also contain this header information.</p>
+      <pre class="highlight shell"><span class="o">[</span>OrchestrateClientPool<span class="o">(</span>1<span class="o">)]</span> INFO io.orchestrate.client.ClientFilter - Received content: HttpResponsePacket <span class="o">(</span>&#x000A;  <span class="nv">status</span><span class="o">=</span>200&#x000A;  <span class="nv">reason</span><span class="o">=</span>OK&#x000A;  <span class="nv">protocol</span><span class="o">=</span>HTTP/1.1&#x000A;  content-length<span class="o">=</span>101&#x000A;  <span class="nv">committed</span><span class="o">=</span><span class="nb">false&#x000A;  </span><span class="nv">headers</span><span class="o">=[</span>&#x000A;      content-type<span class="o">=</span>application/json&#x000A;      <span class="nv">date</span><span class="o">=</span>Fri, 29 Nov 2013 15:36:59 GMT&#x000A;      x-orchestrate-req-id<span class="o">=</span>1622b5e0-590c-11e3-a6c4-12313d2f50f8&#x000A;      content-length<span class="o">=</span>101&#x000A;      <span class="nv">connection</span><span class="o">=</span>keep-alive]&#x000A;<span class="o">)</span></pre>
+      <p>If you believe you&rsquo;ve found a bug in the service, please open an issue (see below)
+       and mention the <code>X-Orchestrate-Req-Id</code> in it if possible. Thanks. <code>:)</code></p>
+      
+      <h2><a name="issues"></a> Issues</h2>
+      
+      <p>The codebase is managed on <a href="https://github.com/orchestrate-io/orchestrate-java-client">GitHub</a>,
+       we also use their issue tracker to manage bug reporting. If you find a bug
+       please report it:</p>
+      
+      <p><a href="https://github.com/orchestrate-io/orchestrate-java-client/issues">https://github.com/orchestrate-io/orchestrate-java-client/issues</a></p>
+      <footer>Orchestrate.io &copy; 2013</footer>
+    </div>
+  </body>
+</html>
