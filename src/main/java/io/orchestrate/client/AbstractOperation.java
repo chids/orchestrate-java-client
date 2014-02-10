@@ -20,6 +20,7 @@ import org.glassfish.grizzly.http.HttpHeader;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,14 +60,13 @@ abstract class AbstractOperation<T> {
      *                  completes.
      * @see io.orchestrate.client.OrchestrateFuture#addListener(OrchestrateFutureListener)
      */
-    public final void addListener(final OrchestrateFutureListener<T>... listeners) {
+    public final void addListener(final Iterable<OrchestrateFutureListener<T>> listeners) {
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
         }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
+        for (final OrchestrateFutureListener<T> listener : listeners) {
+            this.listeners.add(listener);
         }
-        Collections.addAll(this.listeners, listeners);
     }
 
     /**
@@ -84,14 +84,13 @@ abstract class AbstractOperation<T> {
      * @param listeners The listeners to remove from the future for this operation.
      * @see io.orchestrate.client.OrchestrateFuture#removeListener(OrchestrateFutureListener)
      */
-    public final void removeListener(final OrchestrateFutureListener<T>... listeners) {
+    public final void removeListener(final Iterable<OrchestrateFutureListener<T>> listeners) {
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
         }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
+        for (final OrchestrateFutureListener<T> listener : listeners) {
+            this.listeners.remove(listener);
         }
-        Collections.addAll(this.listeners, listeners);
     }
 
 }

@@ -77,7 +77,7 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
 
     /** {@inheritDoc} */
     @Override
-    public void findOne(final String key, final OrchestrateFutureListener<KvObject<T>>... listeners) {
+    public void findOne(final String key, final Iterable<OrchestrateFutureListener<KvObject<T>>> listeners) {
         if (key == null) {
             throw new IllegalArgumentException("'key' cannot be null.");
         }
@@ -86,9 +86,6 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
         }
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
-        }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
         }
         final KvFetchOperation<T> kvFetchOp = new KvFetchOperation<T>(collection, key, clazz);
         kvFetchOp.addListener(listeners);
@@ -115,7 +112,7 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
     /** {@inheritDoc} */
     @Override
     public void findOne(
-            final String key, final KvMetadata metadata, final OrchestrateFutureListener<KvObject<T>>... listeners) {
+            final String key, final KvMetadata metadata, final Iterable<OrchestrateFutureListener<KvObject<T>>> listeners) {
         if (key == null) {
             throw new IllegalArgumentException("'key' cannot be null.");
         }
@@ -127,9 +124,6 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
         }
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
-        }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
         }
         final KvFetchOperation<T> kvFetchOp = new KvFetchOperation<T>(collection, key, metadata, clazz);
         kvFetchOp.addListener(listeners);
@@ -159,7 +153,7 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
     /** {@inheritDoc} */
     @Override
     public void findOne(
-            final String key, final String ref, final OrchestrateFutureListener<KvObject<T>>... listeners) {
+            final String key, final String ref, final Iterable<OrchestrateFutureListener<KvObject<T>>> listeners) {
         if (key == null) {
             throw new IllegalArgumentException("'key' cannot be null.");
         }
@@ -174,9 +168,6 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
         }
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
-        }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
         }
         final KvFetchOperation<T> kvFetchOp = new KvFetchOperation<T>(collection, key, ref, clazz);
         kvFetchOp.addListener(listeners);
@@ -201,7 +192,8 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
 
     /** {@inheritDoc} */
     @Override
-    public void save(String key, T value, OrchestrateFutureListener<KvMetadata>... listeners) {
+    public void save(
+            final String key, final T value, final Iterable<OrchestrateFutureListener<KvMetadata>> listeners) {
         if (key == null) {
             throw new IllegalArgumentException("'key' cannot be null.");
         }
@@ -213,9 +205,6 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
         }
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
-        }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
         }
         final KvStoreOperation kvStoreOp = new KvStoreOperation(collection, key, value);
         kvStoreOp.addListener(listeners);
@@ -242,7 +231,7 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
     /** {@inheritDoc} */
     @Override
     public void save(
-            final String key, final T value, final boolean ifAbsent, final OrchestrateFutureListener<KvMetadata>... listeners) {
+            final String key, final T value, final boolean ifAbsent, final Iterable<OrchestrateFutureListener<KvMetadata>> listeners) {
         if (key == null) {
             throw new IllegalArgumentException("'key' cannot be null.");
         }
@@ -254,9 +243,6 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
         }
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
-        }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
         }
         final KvStoreOperation kvStoreOp =
                 new KvStoreOperation(collection, key, value, ifAbsent);
@@ -287,7 +273,7 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
     /** {@inheritDoc} */
     @Override
     public void save(
-            final String key, final T value, final KvMetadata metadata, final OrchestrateFutureListener<KvMetadata>... listeners) {
+            final String key, final T value, final KvMetadata metadata, final Iterable<OrchestrateFutureListener<KvMetadata>> listeners) {
         if (key == null) {
             throw new IllegalArgumentException("'key' cannot be null.");
         }
@@ -302,9 +288,6 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
         }
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
-        }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
         }
         final KvStoreOperation kvStoreOp =
                 new KvStoreOperation(collection, key, value, metadata);
@@ -338,7 +321,7 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
     /** {@inheritDoc} */
     @Override
     public void save(
-            final String key, final T value, final String currentRef, final OrchestrateFutureListener<KvMetadata>... listeners) {
+            final String key, final T value, final String currentRef, final Iterable<OrchestrateFutureListener<KvMetadata>> listeners) {
         if (key == null) {
             throw new IllegalArgumentException("'key' cannot be null.");
         }
@@ -356,9 +339,6 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
         }
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
-        }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
         }
         final KvStoreOperation kvStoreOp =
                 new KvStoreOperation(collection, key, value, currentRef);
@@ -381,7 +361,7 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
 
     /** {@inheritDoc} */
     @Override
-    public void delete(final String key, final OrchestrateFutureListener<Boolean>... listeners) {
+    public void delete(final String key, final Iterable<OrchestrateFutureListener<Boolean>> listeners) {
         if (key == null) {
             throw new IllegalArgumentException("'key' cannot be null.");
         }
@@ -390,9 +370,6 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
         }
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
-        }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
         }
         final DeleteOperation deleteOp = new DeleteOperation(collection, key);
         deleteOp.addListener(listeners);
@@ -418,7 +395,7 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
     /** {@inheritDoc} */
     @Override
     public void delete(
-            final String key, final KvMetadata metadata, final OrchestrateFutureListener<Boolean>... listeners) {
+            final String key, final KvMetadata metadata, final Iterable<OrchestrateFutureListener<Boolean>> listeners) {
         if (key == null) {
             throw new IllegalArgumentException("'key' cannot be null.");
         }
@@ -430,9 +407,6 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
         }
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
-        }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
         }
         final DeleteOperation deleteOp = new DeleteOperation(collection, key, metadata);
         deleteOp.addListener(listeners);
@@ -461,7 +435,7 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
     /** {@inheritDoc} */
     @Override
     public void delete(
-            final String key, final String currentRef, final OrchestrateFutureListener<Boolean>... listeners) {
+            final String key, final String currentRef, final Iterable<OrchestrateFutureListener<Boolean>> listeners) {
         if (key == null) {
             throw new IllegalArgumentException("'key' cannot be null.");
         }
@@ -477,9 +451,6 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
         }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
-        }
         final DeleteOperation deleteOp = new DeleteOperation(collection, key, currentRef);
         deleteOp.addListener(listeners);
         client.execute(deleteOp);
@@ -494,12 +465,9 @@ public abstract class GenericAsyncDao<T> implements AsyncDao<T> {
 
     /** {@inheritDoc} */
     @Override
-    public void deleteAll(final OrchestrateFutureListener<Boolean>... listeners) {
+    public void deleteAll(final Iterable<OrchestrateFutureListener<Boolean>> listeners) {
         if (listeners == null) {
             throw new IllegalArgumentException("'listeners' cannot be null.");
-        }
-        if (listeners.length < 1) {
-            throw new IllegalArgumentException("'listeners' cannot be empty.");
         }
         final DeleteOperation deleteOp = new DeleteOperation(collection);
         deleteOp.addListener(listeners);

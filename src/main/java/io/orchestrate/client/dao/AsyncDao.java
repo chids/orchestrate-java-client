@@ -47,7 +47,7 @@ public interface AsyncDao<T> {
      * @param key The key used to find the object.
      * @param listeners The callbacks to fire on the operation's response.
      */
-    void findOne(final String key, final OrchestrateFutureListener<KvObject<T>>... listeners);
+    void findOne(final String key, final Iterable<OrchestrateFutureListener<KvObject<T>>> listeners);
 
     /**
      * Return a {@code Future} for the object stored with the specified
@@ -68,7 +68,7 @@ public interface AsyncDao<T> {
      * @param metadata The metadata about the version of the object to get.
      * @param listeners The callbacks to fire on the operation's response.
      */
-    void findOne(final String key, final KvMetadata metadata, final OrchestrateFutureListener<KvObject<T>>... listeners);
+    void findOne(final String key, final KvMetadata metadata, final Iterable<OrchestrateFutureListener<KvObject<T>>> listeners);
 
     /**
      * Return a {@code Future} for the object stored with the specified
@@ -89,7 +89,7 @@ public interface AsyncDao<T> {
      * @param ref The version of the object.
      * @param listeners The callbacks to fire on the operation's response.
      */
-    void findOne(final String key, final String ref, final OrchestrateFutureListener<KvObject<T>>... listeners);
+    void findOne(final String key, final String ref, final Iterable<OrchestrateFutureListener<KvObject<T>>> listeners);
 
     /**
      * Save the specified {@code value} to the {@code key}. This returns a
@@ -109,7 +109,7 @@ public interface AsyncDao<T> {
      * @param value The object to save.
      * @param listeners The callbacks to fire on the operation's response.
      */
-    void save(final String key, final T value, final OrchestrateFutureListener<KvMetadata>... listeners);
+    void save(final String key, final T value, final Iterable<OrchestrateFutureListener<KvMetadata>> listeners);
 
     /**
      * Save the specified {@code value} to the {@code key} if and only if the
@@ -140,7 +140,7 @@ public interface AsyncDao<T> {
      *                 if the specified {@code key} does not already exist.
      * @param listeners The callbacks to fire on the operation's response.
      */
-    void save(final String key, final T value, final boolean ifAbsent, final OrchestrateFutureListener<KvMetadata>... listeners);
+    void save(final String key, final T value, final boolean ifAbsent, final Iterable<OrchestrateFutureListener<KvMetadata>> listeners);
 
     /**
      * Save the specified {@code value} to the {@code key} if and only if the
@@ -166,7 +166,7 @@ public interface AsyncDao<T> {
      * @param metadata The metadata about the current object stored to this key.
      * @param listeners The callbacks to fire on the operation's response.
      */
-    void save(final String key, final T value, final KvMetadata metadata, final OrchestrateFutureListener<KvMetadata>... listeners);
+    void save(final String key, final T value, final KvMetadata metadata, final Iterable<OrchestrateFutureListener<KvMetadata>> listeners);
 
     /**
      * Save the specified {@code value} to the {@code key} if and only if the
@@ -195,7 +195,7 @@ public interface AsyncDao<T> {
      * @param currentRef The ref of the last known object stored to this key.
      * @param listeners Thhe callbacks to fire on the operation's response.
      */
-    void save(final String key, final T value, final String currentRef, final OrchestrateFutureListener<KvMetadata>... listeners);
+    void save(final String key, final T value, final String currentRef, final Iterable<OrchestrateFutureListener<KvMetadata>> listeners);
 
     /**
      * Delete the object with the specified {@code key}.
@@ -212,7 +212,7 @@ public interface AsyncDao<T> {
      * @param key The key of the object to delete.
      * @param listeners The callbacks to fire on the operation's response.
      */
-    void delete(final String key, final OrchestrateFutureListener<Boolean>... listeners);
+    void delete(final String key, final Iterable<OrchestrateFutureListener<Boolean>> listeners);
 
     /**
      * Delete the object with the specified {@code key} if and only if the ref
@@ -238,7 +238,7 @@ public interface AsyncDao<T> {
      * @param metadata The metadata about the current object stored to this key.
      * @param listeners The callbacks to fire on the operation's response.
      */
-    void delete(final String key, final KvMetadata metadata, final OrchestrateFutureListener<Boolean>... listeners);
+    void delete(final String key, final KvMetadata metadata, final Iterable<OrchestrateFutureListener<Boolean>> listeners);
 
     /**
      * Delete the object with the specified {@code key} if and only if the
@@ -264,7 +264,7 @@ public interface AsyncDao<T> {
      * @param currentRef The ref of the last known object stored to this key.
      * @param listeners The callbacks to fire on the operation's response.
      */
-    void delete(final String key, final String currentRef, final OrchestrateFutureListener<Boolean>... listeners);
+    void delete(final String key, final String currentRef, final Iterable<OrchestrateFutureListener<Boolean>> listeners);
 
     /**
      * Delete all objects in the collection.
@@ -278,6 +278,6 @@ public interface AsyncDao<T> {
      *
      * @param listeners The callbacks to fire on the operation's response.
      */
-    void deleteAll(final OrchestrateFutureListener<Boolean>... listeners);
+    void deleteAll(final Iterable<OrchestrateFutureListener<Boolean>> listeners);
 
 }
