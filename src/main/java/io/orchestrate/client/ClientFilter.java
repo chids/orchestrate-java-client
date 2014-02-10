@@ -47,6 +47,8 @@ final class ClientFilter extends BaseFilter {
 
     /** The header value to authenticate with the Orchestrate.io service */
     private final String authHeaderValue;
+    /** The header value to indicate the client and version queried with. */
+    private final String userAgentValue;
     /** The hostname for the Orchestrate.io service. */
     private final String host;
     /** The version of the Orchestrate.io API to use. */
@@ -69,6 +71,8 @@ final class ClientFilter extends BaseFilter {
                 DEFAULT_ATTRIBUTE_BUILDER.createAttribute(HTTP_RESPONSE_ATTR);
         this.authHeaderValue =
                 "Basic ".concat(Base64Utils.encodeToString(builder.getApiKey().getBytes(), true));
+        this.userAgentValue =
+                "Orchestrate Java Client/" + getClass().getPackage().getImplementationVersion();
         this.host = builder.getHost().toString();
         this.version = builder.getVersion().name();
         this.mapper = builder.getMapper();
@@ -128,6 +132,7 @@ final class ClientFilter extends BaseFilter {
 
         // adjust the HTTP request to include standard headers
         httpHeader.setProtocol(Protocol.HTTP_1_1);
+        httpHeader.setHeader(Header.UserAgent, userAgentValue);
         httpHeader.setHeader(Header.Host, host);
         httpHeader.setRequestURI(urlEncoder.encodeURL(uriWithPrefix));
 
