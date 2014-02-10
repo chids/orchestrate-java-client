@@ -16,6 +16,7 @@
 package io.orchestrate.client.integration;
 
 import io.orchestrate.client.Client;
+import io.orchestrate.client.ClientBuilder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -43,7 +44,7 @@ public abstract class OperationTest {
             throw new IllegalStateException("Cannot run integration tests, 'apiKey' is blank.");
         }
 
-        client = Client.builder(apiKey)
+        client = new ClientBuilder(apiKey)
                 .poolSize(5)
                 .maxPoolSize(Integer.MAX_VALUE)
                 .build();

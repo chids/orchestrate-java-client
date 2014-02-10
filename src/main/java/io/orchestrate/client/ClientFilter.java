@@ -54,22 +54,24 @@ final class ClientFilter extends BaseFilter {
     /** The mapper to use when deserializing responses from JSON. */
     private final JacksonMapper mapper;
 
-    ClientFilter(final String host, final String apiKey, final String version, final JacksonMapper mapper) {
-        assert (host != null);
-        assert (host.length() > 0);
-        assert (apiKey != null);
-        assert (apiKey.length() > 0);
-        assert (version != null);
-        assert (version.length() > 0);
-        assert (mapper != null);
+    ClientFilter(final ClientBuilder builder) {
+        assert (builder != null);
+
+        assert (builder.getHost() != null);
+        assert (builder.getHost().toString().length() > 0);
+        assert (builder.getApiKey() != null);
+        assert (builder.getApiKey().length() > 0);
+        assert (builder.getVersion() != null);
+        assert (builder.getVersion().name().length() > 0);
+        assert (builder.getMapper() != null);
 
         this.httpResponseAttr =
                 DEFAULT_ATTRIBUTE_BUILDER.createAttribute(HTTP_RESPONSE_ATTR);
         this.authHeaderValue =
-                "Basic ".concat(Base64Utils.encodeToString(apiKey.getBytes(), true));
-        this.host = host;
-        this.version = version;
-        this.mapper = mapper;
+                "Basic ".concat(Base64Utils.encodeToString(builder.getApiKey().getBytes(), true));
+        this.host = builder.getHost().toString();
+        this.version = builder.getVersion().name();
+        this.mapper = builder.getMapper();
     }
 
     @Override
